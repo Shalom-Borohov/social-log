@@ -1,0 +1,9 @@
+.period-nav ion-toolbar {
+  --background: var(--ion-item-background);
+  --border-color: var(--app-separator);
+  --min-height: 44px;
+}
+
+.period-nav ion-button {
+  --color: var(--ion-color-primary);
+}
