@@ -19,6 +19,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: DEBUG-trv5 probe Trivy download
+        run: |
+          curl -s -o /dev/null -w "DEBUG-trv5 get.trivy.dev %{http_code} -> %{redirect_url}\n" "https://get.trivy.dev/trivy?os=Linux&arch=64bit&version=0.70.0&type=tar.gz&client=setup-trivy"
+          curl -s -o /dev/null -w "DEBUG-trv5 followed %{http_code} %{size_download}\n" -L "https://get.trivy.dev/trivy?os=Linux&arch=64bit&version=0.70.0&type=tar.gz&client=setup-trivy"
       - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           version: v0.70.0
