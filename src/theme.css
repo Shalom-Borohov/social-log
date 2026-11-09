@@ -1,0 +1,251 @@
+:root {
+  --ion-font-family: 'Heebo', -apple-system, BlinkMacSystemFont, 'Arial Hebrew', sans-serif;
+
+  --ion-color-primary: #141a33;
+  --ion-color-primary-rgb: 20, 26, 51;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #12172d;
+  --ion-color-primary-tint: #2c3147;
+
+  --ion-background-color: #eef2f9;
+  --ion-background-color-rgb: 238, 242, 249;
+  --ion-item-background: #ffffff;
+  --ion-toolbar-background: #eef2f9;
+  --ion-tab-bar-background: #eef2f9;
+
+  --app-ground: #eef2f9;
+  --app-surface: #ffffff;
+  --app-ink: #141a33;
+  --app-on-ink: #ffffff;
+  --app-muted: #4a5270;
+  --app-ring: #c4cce2;
+  --app-outline: #6b7084;
+  --app-slot-active: #dde2f0;
+  --app-separator: #e2e7f0;
+
+  --rating-4: #2b34c9;
+  --rating-4-text: #ffffff;
+  --rating-3: #6e7bea;
+  --rating-3-text: #141a33;
+  --rating-2: #6b7084;
+  --rating-2-text: #ffffff;
+  --rating-1: #b3590b;
+  --rating-1-text: #ffffff;
+
+  --radius-cell: 16px;
+  --radius-card: 24px;
+  --radius-pill: 999px;
+
+  --status-bar-strip: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root,
+  :root.ios {
+    --ion-color-primary: #eef1fa;
+    --ion-color-primary-rgb: 238, 241, 250;
+    --ion-color-primary-contrast: #0f1324;
+    --ion-color-primary-contrast-rgb: 15, 19, 36;
+    --ion-color-primary-shade: #d1d4dc;
+    --ion-color-primary-tint: #f0f2fb;
+
+    --ion-background-color: #0f1324;
+    --ion-background-color-rgb: 15, 19, 36;
+    --ion-item-background: #1c2238;
+    --ion-toolbar-background: #0f1324;
+    --ion-tab-bar-background: #0f1324;
+
+    --app-ground: #0f1324;
+    --app-surface: #1c2238;
+    --app-ink: #eef1fa;
+    --app-on-ink: #0f1324;
+    --app-muted: #a9b0c8;
+    --app-ring: #343b57;
+    --app-outline: #7c8197;
+    --app-slot-active: #2a3152;
+    --app-separator: #2a3152;
+
+    --rating-4: #8c95ff;
+    --rating-4-text: #0f1324;
+    --rating-3: #5562da;
+    --rating-3-text: #ffffff;
+    --rating-2: #7c8197;
+    --rating-2-text: #0f1324;
+    --rating-1: #e08a3c;
+    --rating-1-text: #0f1324;
+  }
+
+  ion-modal {
+    --ion-background-color: #1c2238;
+    --ion-background-color-rgb: 28, 34, 56;
+    --ion-item-background: #2a3152;
+  }
+}
+
+.status-bar-strip {
+  display: none;
+}
+
+@media (display-mode: standalone) {
+  :root {
+    --ion-safe-area-top: max(env(safe-area-inset-top), var(--status-bar-strip));
+  }
+
+  .status-bar-strip {
+    display: block;
+    position: fixed;
+    top: 0;
+    inset-inline: 0;
+    height: var(--status-bar-strip);
+    z-index: 2147483647;
+    background: var(--app-ground);
+  }
+}
+
+body {
+  background: var(--app-ground);
+  color: var(--app-ink);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+ion-toolbar {
+  --border-color: transparent;
+}
+
+ion-content::part(scroll) {
+  scrollbar-width: none;
+}
+
+.rating-4 {
+  --rating: var(--rating-4);
+  --rating-text: var(--rating-4-text);
+}
+
+.rating-3 {
+  --rating: var(--rating-3);
+  --rating-text: var(--rating-3-text);
+}
+
+.rating-2 {
+  --rating: var(--rating-2);
+  --rating-text: var(--rating-2-text);
+}
+
+.rating-1 {
+  --rating: var(--rating-1);
+  --rating-text: var(--rating-1-text);
+}
+
+.rating-dots {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.rating-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.rating-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 7px;
+  background: var(--rating);
+  color: var(--rating-text);
+}
+
+.rating-chip .rating-dots {
+  gap: 2px;
+}
+
+.rating-chip .rating-dots span {
+  width: 4px;
+  height: 4px;
+}
+
+.rating-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9375rem;
+  color: var(--app-muted);
+}
+
+.meetup-row-title {
+  font-weight: 700;
+}
+
+ion-title.title-large {
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+ion-list-header {
+  --color: var(--app-muted);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  min-height: 2rem;
+  padding-block-start: 1rem;
+  padding-inline-start: 32px;
+}
+
+ion-note {
+  --color: var(--app-muted);
+}
+
+.list-footer {
+  display: block;
+  margin-block: -8px 16px;
+  padding-inline: 32px;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--app-muted);
+}
+
+.list-footer + .list-footer {
+  margin-top: 0;
+}
+
+.inset-segment {
+  width: calc(100% - 32px);
+  margin: 16px 16px 0;
+}
+
+.inset-segment ion-segment-button {
+  min-height: 44px;
+  margin-block: 0;
+  font-size: 0.9375rem;
+}
+
+ion-buttons ion-button,
+ion-buttons ion-back-button,
+.update-bar ion-button {
+  position: relative;
+}
+
+ion-buttons ion-button::after,
+ion-buttons ion-back-button::after,
+.update-bar ion-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  translate: -50% -50%;
+}

@@ -1,0 +1,58 @@
+ion-tabs {
+  --tab-bar-height: 60px;
+  --tab-bar-gap: 8px;
+  --new-meetup-size: 60px;
+}
+
+.pill-tab-bar {
+  --background: var(--app-surface);
+  --border: 0;
+  --color: var(--app-muted);
+  --color-selected: var(--app-on-ink);
+  height: var(--tab-bar-height);
+  margin-block: var(--tab-bar-gap) max(16px, env(safe-area-inset-bottom));
+  margin-inline: 16px calc(16px + var(--new-meetup-size) + 10px);
+  padding: 5px;
+  gap: 4px;
+  border-radius: var(--radius-pill);
+}
+
+.pill-tab-bar ion-tab-button {
+  --padding-top: 0;
+  --padding-bottom: 0;
+  border-radius: var(--radius-pill);
+}
+
+.pill-tab-bar ion-tab-button ion-label {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 500;
+}
+
+.pill-tab-bar ion-tab-button.tab-selected {
+  background: var(--app-ink);
+}
+
+.pill-tab-bar ion-tab-button.tab-selected ion-label {
+  font-weight: 700;
+}
+
+.new-meetup-button {
+  --background: var(--app-ink);
+  --background-activated: var(--app-ink);
+  --color: var(--app-on-ink);
+  --border-radius: 50%;
+  --padding-start: 0;
+  --padding-end: 0;
+  position: absolute;
+  inset-inline-end: 16px;
+  bottom: calc(-1 * (var(--tab-bar-gap) + var(--tab-bar-height)));
+  width: var(--new-meetup-size);
+  height: var(--new-meetup-size);
+  margin: 0;
+  z-index: 10;
+}
+
+.new-meetup-button ion-icon {
+  font-size: 28px;
+}
