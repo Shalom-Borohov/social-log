@@ -225,6 +225,13 @@
   color: var(--app-ink);
 }
 
+.log-group-hint {
+  align-self: flex-start;
+  margin: 0;
+  color: var(--app-muted);
+  font-size: 15px;
+}
+
 .log-not-found {
   margin: 0;
   padding: 0 20px;

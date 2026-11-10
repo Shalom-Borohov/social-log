@@ -29,8 +29,10 @@ function joinNames(names: string[]): string {
   return `${leading} ${MEETUP_COPY.and(names[names.length - 1])}`
 }
 
-export const sameMembers = (personIds: string[], group: Group) =>
-  personIds.length === group.memberIds.length && group.memberIds.every((memberId) => personIds.includes(memberId))
+export const samePeople = (personIds: string[], otherIds: string[]) =>
+  personIds.length === otherIds.length && otherIds.every((otherId) => personIds.includes(otherId))
+
+export const sameMembers = (personIds: string[], group: Group) => samePeople(personIds, group.memberIds)
 
 export function peopleLabel(personIds: string[], people: Person[], groups: Group[], groupId?: string): string {
   const group = groups.find((candidate) => candidate.id === groupId)

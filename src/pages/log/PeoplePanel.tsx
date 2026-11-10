@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { addPerson, setPersonHidden } from '../../data/repo'
-import { sameMembers } from '../../domain/sentence'
-import type { Group, Person } from '../../domain/types'
+import { GROUP_MINIMUM, groupSuggestion } from '../../domain/groupSuggestion'
+import { peopleLabel, sameMembers } from '../../domain/sentence'
+import type { Group, Meetup, Person } from '../../domain/types'
 import { useSave } from '../../hooks/useSave'
 import { LOG_COPY } from './copy'
 import { type DraftFields, toggledIn } from './meetupDraft'
@@ -10,22 +11,25 @@ import { Chip, ChipGroup, EditToggle, MainAction, Panel, RemoveChip } from './Pa
 import { useChipEditing } from './useChipEditing'
 import { useGroupPrompt } from './useGroupPrompt'
 
-const GROUP_MINIMUM = 2
-
 type PeopleChoice = Pick<DraftFields, 'personIds' | 'groupId'>
 
 interface PeoplePanelProps {
   choice: PeopleChoice
+  meetupId?: string
   people: Person[]
   groups: Group[]
+  meetups: Meetup[]
   onChange: (choice: Partial<PeopleChoice>) => void
   onNewPerson: (personId: string) => void
   onNext: () => void
 }
 
-export function PeoplePanel({ choice, people, groups, onChange, onNewPerson, onNext }: PeoplePanelProps) {
+export function PeoplePanel({ choice, meetupId, people, groups, meetups, onChange, onNewPerson, onNext }: PeoplePanelProps) {
   const { personIds, groupId } = choice
   const [newName, setNewName] = useState('')
+  const hintId = useId()
+  const together = groupSuggestion(personIds, meetups, groups, meetupId)
+  const suggestGroup = together > 0
   const save = useSave()
   const askGroupName = useGroupPrompt((group) => onChange({ groupId: group.id }))
   const { editing, toggleEditing, hideWithUndo } = useChipEditing()
@@ -92,8 +96,18 @@ export function PeoplePanel({ choice, people, groups, onChange, onNewPerson, onN
         })}
       </ChipGroup>
       <AddField label={LOG_COPY.newName} value={newName} onChange={setNewName} onAdd={() => void addNewPerson()} />
+      {suggestGroup && (
+        <p id={hintId} className="log-group-hint">
+          {LOG_COPY.togetherBefore(together, peopleLabel(personIds, people, groups))}
+        </p>
+      )}
       {personIds.length >= GROUP_MINIMUM && (
-        <button type="button" className="log-quiet-action" onClick={() => askGroupName(personIds)}>
+        <button
+          type="button"
+          className="log-quiet-action"
+          aria-describedby={suggestGroup ? hintId : undefined}
+          onClick={() => askGroupName(personIds)}
+        >
           {LOG_COPY.saveAsGroup}
         </button>
       )}

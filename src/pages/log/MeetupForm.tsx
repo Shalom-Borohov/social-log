@@ -50,8 +50,10 @@ export function MeetupForm({
     people: () => (
       <PeoplePanel
         choice={draft}
+        meetupId={meetupId}
         people={people}
         groups={groups}
+        meetups={meetups}
         onChange={update}
         onNewPerson={actions.rememberNewPerson}
         onNext={() => fill()}
