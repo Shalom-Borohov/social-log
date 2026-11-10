@@ -1,20 +1,32 @@
 import type { FormEvent } from 'react'
-import { hidePlace, showPlace } from '../../data/repo'
+import { saveChoices } from '../../data/savedChoices'
+import { splitParts } from '../../domain/split'
+import type { SavedChoice } from '../../domain/types'
+import { useRemoveChoice } from '../../hooks/useRemoveWithUndo'
+import { useSave } from '../../hooks/useSave'
 import { LOG_COPY } from './copy'
-import { Chip, ChipGroup, EditToggle, MainAction, Panel, RemoveChip } from './Panel'
+import { Chip, ChipGroup, EditToggle, MainAction, Panel, RemoveChip, SaveForNextTime } from './Panel'
 import { useChipEditing } from './useChipEditing'
+import { useSplitPrompt } from './useSplitPrompt'
 
 interface PlacePanelProps {
   place: string
-  recentPlaces: string[]
+  savedPlaces: SavedChoice[]
   onChange: (place: string) => void
   onPick: (place: string) => void
   onNext: () => void
 }
 
-export function PlacePanel({ place, recentPlaces, onChange, onPick, onNext }: PlacePanelProps) {
-  const empty = place.trim() === ''
-  const { editing, toggleEditing, hideWithUndo } = useChipEditing()
+export function PlacePanel({ place, savedPlaces, onChange, onPick, onNext }: PlacePanelProps) {
+  const typed = place.trim()
+  const empty = typed === ''
+  const { editing, toggleEditing } = useChipEditing()
+  const remove = useRemoveChoice('place')
+  const askSplit = useSplitPrompt()
+  const save = useSave()
+  const savedNames = savedPlaces.map(({ name }) => name)
+  const alreadySaved = savedNames.includes(typed) || splitParts(typed).every((part) => savedNames.includes(part))
+  const unsaved = !empty && !alreadySaved
 
   function submit(event: FormEvent) {
     event.preventDefault()
@@ -24,12 +36,13 @@ export function PlacePanel({ place, recentPlaces, onChange, onPick, onNext }: Pl
     }
   }
 
-  const hide = (recent: string) =>
-    hideWithUndo(
-      () => hidePlace(recent),
-      () => showPlace(recent),
-      LOG_COPY.placeHidden(recent),
-    )
+  const saveTyped = () =>
+    askSplit({
+      text: typed,
+      header: LOG_COPY.splitSaveHeader,
+      onParts: (parts) => void save(saveChoices('place', parts)),
+      onWhole: (text) => void save(saveChoices('place', [text])),
+    })
 
   return (
     <Panel
@@ -45,15 +58,26 @@ export function PlacePanel({ place, recentPlaces, onChange, onPick, onNext }: Pl
           onChange={(event) => onChange(event.target.value)}
         />
       </form>
-      {recentPlaces.length > 0 && (
+      {unsaved && <SaveForNextTime name={typed} onSave={saveTyped} />}
+      {(savedPlaces.length > 0 || editing) && (
         <>
           <EditToggle editing={editing} onToggle={toggleEditing} />
-          <ChipGroup label={LOG_COPY.recentPlaces}>
-            {recentPlaces.map((recent) =>
+          <ChipGroup label={LOG_COPY.savedPlaces}>
+            {savedPlaces.map((saved) =>
               editing ? (
-                <RemoveChip key={recent} label={recent} onRemove={() => void hide(recent)} />
+                <RemoveChip
+                  key={saved.name}
+                  label={saved.name}
+                  removeLabel={LOG_COPY.removeChip(saved.name)}
+                  onRemove={() => void remove(saved)}
+                />
               ) : (
-                <Chip key={recent} label={recent} pressed={recent === place.trim()} onClick={() => onPick(recent)} />
+                <Chip
+                  key={saved.name}
+                  label={saved.name}
+                  pressed={saved.name === typed}
+                  onClick={() => onPick(saved.name)}
+                />
               ),
             )}
           </ChipGroup>

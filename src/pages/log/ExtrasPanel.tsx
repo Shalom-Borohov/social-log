@@ -1,38 +1,52 @@
 import { useState } from 'react'
 import { COMMON_COPY } from '../../copy/common'
 import { MEETUP_COPY } from '../../copy/meetup'
-import { INITIATORS } from '../../domain/types'
+import { INITIATORS, type SavedChoice } from '../../domain/types'
+import { ActivityChips } from './ActivityChips'
 import { AddField } from './AddField'
 import { LOG_COPY } from './copy'
-import { type DraftFields, toggledIn } from './meetupDraft'
-import { Chip, ChipGroup, MainAction, Panel } from './Panel'
+import type { DraftFields } from './meetupDraft'
+import { MainAction, Panel } from './Panel'
+import { useSplitPrompt } from './useSplitPrompt'
 
 type Extras = Pick<DraftFields, 'activities' | 'initiator' | 'note'>
 
 interface ExtrasPanelProps {
   extras: Extras
-  ownActivities: string[]
+  savedActivities: SavedChoice[]
   saving: boolean
   onChange: (extras: Partial<Extras>) => void
-  onSave: () => void
+  onSave: (activities: string[]) => void
   onDelete?: () => void
 }
 
-export function ExtrasPanel({ extras, ownActivities, saving, onChange, onSave, onDelete }: ExtrasPanelProps) {
+export function ExtrasPanel({ extras, savedActivities, saving, onChange, onSave, onDelete }: ExtrasPanelProps) {
   const { activities, initiator, note } = extras
   const [newActivity, setNewActivity] = useState('')
-  const offered = [...new Set([...MEETUP_COPY.activityPresets, ...ownActivities, ...activities])]
+  const askSplit = useSplitPrompt()
+  const typed = newActivity.trim()
+  const withAdded = (names: string[]) => [...new Set([...activities, ...names])]
 
-  function addActivity() {
-    const activity = newActivity.trim()
-
-    onChange({ activities: activities.includes(activity) ? activities : [...activities, activity] })
+  function addActivities(names: string[]) {
+    onChange({ activities: withAdded(names) })
     setNewActivity('')
   }
 
+  const addNewActivity = () =>
+    askSplit({
+      text: typed,
+      header: LOG_COPY.splitAddHeader,
+      onParts: addActivities,
+      onWhole: (text) => addActivities([text]),
+    })
+
   const actions = (
     <div className="log-actions">
-      <MainAction label={COMMON_COPY.save} disabled={saving} onClick={onSave} />
+      <MainAction
+        label={COMMON_COPY.save}
+        disabled={saving}
+        onClick={() => onSave(typed === '' ? activities : withAdded([typed]))}
+      />
       {onDelete && (
         <button type="button" className="log-delete" onClick={onDelete}>
           {COMMON_COPY.delete}
@@ -43,17 +57,12 @@ export function ExtrasPanel({ extras, ownActivities, saving, onChange, onSave, o
 
   return (
     <Panel heading={LOG_COPY.panelHeadings.extras} action={actions}>
-      <ChipGroup label={LOG_COPY.activities}>
-        {offered.map((activity) => (
-          <Chip
-            key={activity}
-            label={activity}
-            pressed={activities.includes(activity)}
-            onClick={() => onChange({ activities: toggledIn(activities, activity) })}
-          />
-        ))}
-      </ChipGroup>
-      <AddField label={LOG_COPY.otherActivity} value={newActivity} onChange={setNewActivity} onAdd={addActivity} />
+      <ActivityChips
+        activities={activities}
+        savedActivities={savedActivities}
+        onChange={(activities) => onChange({ activities })}
+      />
+      <AddField label={LOG_COPY.otherActivity} value={newActivity} onChange={setNewActivity} onAdd={addNewActivity} />
       <div className="log-segmented" role="group" aria-label={LOG_COPY.initiator}>
         <span className="log-segmented-label">{LOG_COPY.initiator}</span>
         {INITIATORS.map((option) => (

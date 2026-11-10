@@ -1,3 +1,5 @@
+import type { ChoiceKind } from '../../domain/types'
+
 export const SETTINGS_COPY = {
   backupRestored: 'הגיבוי שוחזר',
   backup: 'גיבוי',
@@ -8,6 +10,10 @@ export const SETTINGS_COPY = {
   groupSize: (count: number) => `${count} אנשים`,
   deleteGroupHeader: 'למחוק את הקבוצה?',
   deleteGroupMessage: 'המפגשים שלה יישארו, עם שמות האנשים.',
+  savedChoices: {
+    place: 'מקומות שמורים',
+    activity: 'פעילויות שמורות',
+  } satisfies Record<ChoiceKind, string>,
   hideFromOrbit: 'הסתרה מהמסלול',
   deletePersonHeader: (name: string) => `למחוק את ${name}?`,
   deleteRule: 'אפשר למחוק רק מי שלא מופיע באף מפגש או קבוצה.',

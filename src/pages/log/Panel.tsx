@@ -34,12 +34,13 @@ export function Chip({ label, pressed, disabled = false, onClick }: ChipProps) {
 
 interface RemoveChipProps {
   label: string
+  removeLabel: string
   onRemove: () => void
 }
 
-export function RemoveChip({ label, onRemove }: RemoveChipProps) {
+export function RemoveChip({ label, removeLabel, onRemove }: RemoveChipProps) {
   return (
-    <button type="button" className="log-chip log-chip-remove" aria-label={LOG_COPY.hideChip(label)} onClick={onRemove}>
+    <button type="button" className="log-chip log-chip-remove" aria-label={removeLabel} onClick={onRemove}>
       {label}
       <span aria-hidden="true">✕</span>
     </button>
@@ -62,6 +63,19 @@ export function EditToggle({ editing, onToggle }: EditToggleProps) {
 interface ChipGroupProps {
   label: string
   children: ReactNode
+}
+
+interface SaveForNextTimeProps {
+  name: string
+  onSave: () => void
+}
+
+export function SaveForNextTime({ name, onSave }: SaveForNextTimeProps) {
+  return (
+    <button type="button" className="log-quiet-action" onClick={onSave}>
+      {LOG_COPY.saveForNextTime(name)}
+    </button>
+  )
 }
 
 export function ChipGroup({ label, children }: ChipGroupProps) {

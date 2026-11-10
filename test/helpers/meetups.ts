@@ -1,4 +1,8 @@
-import type { Group, Meetup, Person } from '../../src/domain/types'
+import type { Group, Meetup, Person, SavedChoice } from '../../src/domain/types'
+
+export const ACTIVITY_PRESETS = ['אוכל', 'קפה', 'הליכה', 'בבית', 'ספורט', 'הופעה/סרט']
+
+export const names = (choices: SavedChoice[]) => choices.map(({ name }) => name)
 
 let nextId = 0
 

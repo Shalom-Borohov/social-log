@@ -7,6 +7,12 @@ import { useSave } from '../../hooks/useSave'
 import { CALENDAR_PATH } from '../../navigation/paths'
 import { LOG_COPY } from './copy'
 
+function closeKeyboard() {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur()
+  }
+}
+
 async function writeMeetup(draft: MeetupDraft, meetupId: string | undefined) {
   if (meetupId) {
     await updateMeetup(meetupId, draft)
@@ -30,6 +36,7 @@ export function useLogActions(meetupId: string | undefined) {
 
   function close() {
     void forgetUnusedPeople(newPersonIds.current)
+    closeKeyboard()
 
     if (router.canGoBack()) {
       router.goBack()
@@ -43,11 +50,14 @@ export function useLogActions(meetupId: string | undefined) {
   async function saveMeetup(draft: MeetupDraft) {
     setSaving(true)
     const saved = await save(writeMeetup(draft, meetupId))
-    setSaving(false)
 
-    if (saved) {
-      close()
+    if (!saved) {
+      setSaving(false)
+
+      return
     }
+
+    close()
   }
 
   async function removeMeetup(id: string) {

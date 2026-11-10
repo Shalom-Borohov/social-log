@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { db } from '../../src/data/db'
+import { saveChoices } from '../../src/data/savedChoices'
 import { freezeDate } from '../helpers/clock'
 import { resetDb } from '../helpers/db'
 import { findButton, slot, tap, tapSlot } from '../helpers/log'
@@ -21,8 +22,8 @@ async function openDuration() {
   await tap('בטיילת')
 }
 
-const recentPlaces = async () =>
-  within(await screen.findByRole('group', { name: 'מקומות אחרונים' }))
+const savedPlaces = async () =>
+  within(await screen.findByRole('group', { name: 'מקומות שמורים' }))
     .getAllByRole('button')
     .map((button) => button.textContent)
 
@@ -33,43 +34,37 @@ describe('איפה', () => {
   })
   freezeDate(new Date(2026, 10, 8, 10).getTime())
 
-  it('offers up to six recent places, newest first, each once', async () => {
+  it('offers every saved place, the last used first, then the newest saved', async () => {
+    await saveChoices('place', ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז'].map((letter) => `מקום ${letter}`))
     await db.meetups.bulkPut([
-      ...['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז'].map((letter, index) =>
-        aMeetup({ date: `2026-10-0${index + 1}`, place: `מקום ${letter}`, personIds: ['tamar'] }),
-      ),
-      aMeetup({ date: '2026-11-01', place: 'מקום ג', personIds: ['tamar'] }),
+      aMeetup({ date: '2026-10-01', place: 'מקום ד', personIds: ['tamar'] }),
+      aMeetup({ date: '2026-11-01', place: 'מקום ב', personIds: ['tamar'] }),
+      aMeetup({ date: '2026-11-05', place: 'אצל סבתא', personIds: ['tamar'] }),
     ])
 
     await openPlace()
 
-    expect(await recentPlaces()).toEqual(['מקום ג', 'מקום ז', 'מקום ו', 'מקום ה', 'מקום ד', 'מקום ב'])
+    expect(await savedPlaces()).toEqual(['מקום ב', 'מקום ד', 'מקום ז', 'מקום ו', 'מקום ה', 'מקום ג', 'מקום א'])
   })
 
-  it('hides a recent place in עריכה, moving the next one up, and ביטול brings it back', async () => {
-    await db.meetups.bulkPut(
-      ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז'].map((letter, index) =>
-        aMeetup({ date: `2026-10-0${index + 1}`, place: `מקום ${letter}`, personIds: ['tamar'] }),
-      ),
-    )
+  it('removes a saved place in עריכה, and ביטול brings it back in its place', async () => {
+    await saveChoices('place', ['מקום א', 'מקום ב'])
     await openPlace()
 
     await tap('עריכה')
-    await tap('הסתרה: מקום ז')
-    await waitFor(() => expect(toasts()).toContain('המקום „מקום ז” הוסר מהמקומות האחרונים'))
+    await tap('הסרה: מקום א')
+    await waitFor(() => expect(toasts()).toContain('המקום „מקום א” הוסר מהמקומות השמורים'))
     await tap('סיום')
 
-    expect(await recentPlaces()).toEqual(['מקום ו', 'מקום ה', 'מקום ד', 'מקום ג', 'מקום ב', 'מקום א'])
+    expect(await savedPlaces()).toEqual(['מקום ב'])
 
     clickToastButton('ביטול')
 
-    await waitFor(async () =>
-      expect(await recentPlaces()).toEqual(['מקום ז', 'מקום ו', 'מקום ה', 'מקום ד', 'מקום ג', 'מקום ב']),
-    )
+    await waitFor(async () => expect(await savedPlaces()).toEqual(['מקום ב', 'מקום א']))
   })
 
-  it('fills the place from a recent one and moves on', async () => {
-    await db.meetups.put(aMeetup({ place: 'בטיילת', personIds: ['tamar'] }))
+  it('fills the place from a saved one and moves on', async () => {
+    await saveChoices('place', ['בטיילת'])
 
     await openPlace()
     await tap('בטיילת')
@@ -78,11 +73,14 @@ describe('איפה', () => {
     expect(await slot('כמה זמן')).toHaveAttribute('aria-current', 'step')
   })
 
-  it('offers no recent places before the first meetup', async () => {
+  it('offers no saved places before one is saved, even after a meetup', async () => {
+    await db.meetups.put(aMeetup({ place: 'בטיילת', personIds: ['tamar'] }))
+
     await openPlace()
 
     expect(await screen.findByLabelText('מקום')).toBeInTheDocument()
-    expect(screen.queryByRole('group', { name: 'מקומות אחרונים' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'מקומות שמורים' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'עריכה' })).not.toBeInTheDocument()
   })
 })
 
@@ -90,7 +88,7 @@ describe('כמה זמן', () => {
   beforeEach(async () => {
     await resetDb()
     await db.people.put(tamar)
-    await db.meetups.put(aMeetup({ place: 'בטיילת', personIds: ['tamar'] }))
+    await saveChoices('place', ['בטיילת'])
   })
   freezeDate(new Date(2026, 10, 8, 10).getTime())
 

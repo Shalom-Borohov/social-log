@@ -3,6 +3,7 @@ import { addPerson, setPersonHidden } from '../../data/repo'
 import { GROUP_MINIMUM, groupSuggestion } from '../../domain/groupSuggestion'
 import { peopleLabel, sameMembers } from '../../domain/sentence'
 import type { Group, Meetup, Person } from '../../domain/types'
+import { useRemoveWithUndo } from '../../hooks/useRemoveWithUndo'
 import { useSave } from '../../hooks/useSave'
 import { LOG_COPY } from './copy'
 import { type DraftFields, toggledIn } from './meetupDraft'
@@ -10,6 +11,17 @@ import { AddField } from './AddField'
 import { Chip, ChipGroup, EditToggle, MainAction, Panel, RemoveChip } from './Panel'
 import { useChipEditing } from './useChipEditing'
 import { useGroupPrompt } from './useGroupPrompt'
+import { useSplitPrompt } from './useSplitPrompt'
+
+async function addInOrder(names: string[]) {
+  const ids: string[] = []
+
+  for (const name of names) {
+    ids.push((await addPerson(name)).id)
+  }
+
+  return [...new Set(ids)]
+}
 
 type PeopleChoice = Pick<DraftFields, 'personIds' | 'groupId'>
 
@@ -32,7 +44,9 @@ export function PeoplePanel({ choice, meetupId, people, groups, meetups, onChang
   const suggestGroup = together > 0
   const save = useSave()
   const askGroupName = useGroupPrompt((group) => onChange({ groupId: group.id }))
-  const { editing, toggleEditing, hideWithUndo } = useChipEditing()
+  const askSplit = useSplitPrompt()
+  const { editing, toggleEditing } = useChipEditing()
+  const hideWithUndo = useRemoveWithUndo()
   const shownPeople = people.filter((person) => !person.hidden || personIds.includes(person.id))
   const anyUnpicked = shownPeople.some((person) => !personIds.includes(person.id))
 
@@ -43,14 +57,16 @@ export function PeoplePanel({ choice, meetupId, people, groups, meetups, onChang
       LOG_COPY.personHidden(person.name),
     )
 
-  async function addNewPerson() {
+  async function addPeople(names: string[]) {
     const added = await save(
-      addPerson(newName).then((person) => {
-        if (!people.some(({ id }) => id === person.id)) {
-          onNewPerson(person.id)
+      addInOrder(names).then((addedIds) => {
+        for (const id of addedIds) {
+          if (!people.some((person) => person.id === id)) {
+            onNewPerson(id)
+          }
         }
 
-        onChange({ personIds: personIds.includes(person.id) ? personIds : [...personIds, person.id] })
+        onChange({ personIds: [...new Set([...personIds, ...addedIds])] })
       }),
     )
 
@@ -58,6 +74,14 @@ export function PeoplePanel({ choice, meetupId, people, groups, meetups, onChang
       setNewName('')
     }
   }
+
+  const addNewName = () =>
+    askSplit({
+      text: newName,
+      header: LOG_COPY.splitAddHeader,
+      onParts: (parts) => void addPeople(parts),
+      onWhole: (text) => void addPeople([text]),
+    })
 
   return (
     <Panel
@@ -83,7 +107,12 @@ export function PeoplePanel({ choice, meetupId, people, groups, meetups, onChang
           const picked = personIds.includes(person.id)
 
           return editing && !picked ? (
-            <RemoveChip key={person.id} label={person.name} onRemove={() => void hide(person)} />
+            <RemoveChip
+              key={person.id}
+              label={person.name}
+              removeLabel={LOG_COPY.hideChip(person.name)}
+              onRemove={() => void hide(person)}
+            />
           ) : (
             <Chip
               key={person.id}
@@ -95,7 +124,7 @@ export function PeoplePanel({ choice, meetupId, people, groups, meetups, onChang
           )
         })}
       </ChipGroup>
-      <AddField label={LOG_COPY.newName} value={newName} onChange={setNewName} onAdd={() => void addNewPerson()} />
+      <AddField label={LOG_COPY.newName} value={newName} onChange={setNewName} onAdd={addNewName} />
       {suggestGroup && (
         <p id={hintId} className="log-group-hint">
           {LOG_COPY.togetherBefore(together, peopleLabel(personIds, people, groups))}

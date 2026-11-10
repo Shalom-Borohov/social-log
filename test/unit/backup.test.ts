@@ -1,16 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { countBadRecords, exportBackup, InvalidBackupError, parseBackup, restoreBackup } from '../../src/data/backup'
-import {
-  addMeetup,
-  addPerson,
-  allGroups,
-  allHiddenPlaces,
-  allMeetups,
-  allPeople,
-  hidePlace,
-  saveGroup,
-} from '../../src/data/repo'
+import { addMeetup, addPerson, allGroups, allMeetups, allPeople, saveGroup } from '../../src/data/repo'
+import { allSavedChoices, saveChoices } from '../../src/data/savedChoices'
+import { inSavedOrder } from '../../src/domain/choices'
 import { resetDb } from '../helpers/db'
+import { ACTIVITY_PRESETS, names } from '../helpers/meetups'
 
 const exportedAt = Date.UTC(2026, 10, 8, 20)
 
@@ -49,24 +43,36 @@ describe('backup', () => {
     expect({ people: await allPeople(), groups: await allGroups(), meetups: await allMeetups() }).toStrictEqual(before)
   })
 
-  it('round-trips hidden places', async () => {
-    await hidePlace('בטיילת')
+  it('round-trips the saved places and activities in their order', async () => {
+    await saveChoices('place', ['בטיילת'])
+    await saveChoices('activity', ['שש-בש', 'פינג פונג'])
 
     const backup = parseBackup(JSON.stringify(await exportBackup(exportedAt)))
 
     await resetDb()
-    await hidePlace('בבית')
+    await saveChoices('place', ['בבית'])
     await restoreBackup(backup)
 
-    expect(await allHiddenPlaces()).toEqual(['בטיילת'])
+    expect(backup).not.toHaveProperty('hiddenPlaces')
+    expect(names(inSavedOrder(await allSavedChoices('place')))).toEqual(['בטיילת'])
+    expect(names(inSavedOrder(await allSavedChoices('activity')))).toEqual([...ACTIVITY_PRESETS, 'שש-בש', 'פינג פונג'])
   })
 
-  it('restores an older backup without hidden places as none hidden', async () => {
-    await hidePlace('בבית')
+  it('gives an older backup the chips it showed: recent places not hidden, presets and own activities', async () => {
+    const people = [{ id: 'p', name: 'תמר', hidden: false, createdAt: 1 }]
 
-    await restoreBackup(parseBackup(JSON.stringify({ version: 1, exportedAt, people: [], groups: [], meetups: [] })))
+    const meetups = [
+      { id: 'a', date: '2026-11-01', personIds: ['p'], place: 'בטיילת', minutes: 60, rating: 2, createdAt: 1, activities: ['סנובורד'] },
+      { id: 'b', date: '2026-11-03', personIds: ['p'], place: 'בים', minutes: 60, rating: 2, createdAt: 1 },
+    ]
 
-    expect(await allHiddenPlaces()).toEqual([])
+    await saveChoices('place', ['בבית'])
+    await restoreBackup(
+      parseBackup(JSON.stringify({ version: 1, exportedAt, people, groups: [], meetups, hiddenPlaces: ['בים'] })),
+    )
+
+    expect(names(inSavedOrder(await allSavedChoices('place')))).toEqual(['בטיילת'])
+    expect(names(inSavedOrder(await allSavedChoices('activity')))).toEqual([...ACTIVITY_PRESETS, 'סנובורד'])
   })
 
   it('accepts a meetup without the optional fields', () => {
@@ -106,5 +112,19 @@ describe('backup', () => {
     const bad = { id: 'm', date: '7.11', personIds: [], place: '', minutes: 60, rating: 9, createdAt: 1 }
 
     expect(countBadRecords(JSON.stringify({ version: 1, exportedAt, people: [], groups: [], meetups: [bad] }))).toBe(1)
+  })
+
+  it('counts saved places and activities that would fail to import', () => {
+    const file = {
+      version: 1,
+      exportedAt,
+      people: [],
+      groups: [],
+      meetups: [],
+      savedPlaces: [{ name: '', savedAt: 1 }],
+      savedActivities: [{ name: 'קפה' }],
+    }
+
+    expect(countBadRecords(JSON.stringify(file))).toBe(2)
   })
 })
