@@ -1,5 +1,5 @@
 import { usualGap } from './rhythm'
-import type { Initiator, Meetup } from './types'
+import type { Group, Initiator, Meetup } from './types'
 
 export interface PersonSummary {
   history: Meetup[]
@@ -28,3 +28,7 @@ export function personSummary(personId: string, meetups: Meetup[]): PersonSummar
     initiated,
   }
 }
+
+export const isUnused = (personId: string, meetups: Meetup[], groups: Group[]) =>
+  !meetups.some((meetup) => meetup.personIds.includes(personId)) &&
+  !groups.some((group) => group.memberIds.includes(personId))

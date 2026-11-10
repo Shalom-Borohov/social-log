@@ -18,13 +18,11 @@ export const FRIENDS_COPY = {
   notSeenSince: (name: string, since: string) => `לא ראית את ${name} ${since}`,
   lastTime: (place: string, date: string) => `פעם אחרונה: ${place}, ${date}`,
   neverMet: 'עוד לא נפגשתם',
-  hiddenFromOrbit: 'מוסתר מהמסלול',
   meetupCount: 'מספר מפגשים',
   lastMeetup: 'פעם אחרונה',
   usualGap: (days: string) => `בדרך כלל כל ${days}`,
   notEnoughMeetups: 'עוד אין מספיק מפגשים',
   initiated: (mine: number, total: number) => `יזמת ${mine} מתוך ${total}`,
-  showInOrbit: 'הצגה במסלול',
   history: 'מפגשים',
   personNotFound: 'החבר הזה לא נמצא',
 } as const
