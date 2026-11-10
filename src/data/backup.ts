@@ -17,8 +17,9 @@ import {
   string,
 } from 'valibot'
 import { APP_COPY } from '../copy/app'
+import { initialSavedLists } from '../domain/choices'
 import { isIsoDate, logicalToday, MINUTES_PER_HOUR } from '../domain/logicalDay'
-import { type Group, INITIATORS, type Meetup, type Person, RATINGS } from '../domain/types'
+import { type Group, INITIATORS, type Meetup, type Person, RATINGS, type SavedChoice } from '../domain/types'
 import { db } from './db'
 
 export type Backup = {
@@ -28,6 +29,8 @@ export type Backup = {
   groups: Group[]
   meetups: Meetup[]
   hiddenPlaces?: string[]
+  savedPlaces?: SavedChoice[]
+  savedActivities?: SavedChoice[]
 }
 
 const isNotInTheFuture = (date: string) => date <= logicalToday(Date.now())
@@ -60,6 +63,8 @@ const meetupSchema = object({
   createdAt: number(),
 })
 
+const savedChoiceSchema = object({ name: pipe(string(), minLength(1)), savedAt: number() })
+
 const everyoneIsKnown = ({ people, meetups }: Backup) => {
   const personIds = new Set(people.map(({ id }) => id))
 
@@ -74,6 +79,8 @@ const backupSchema = pipe(
     groups: array(groupSchema),
     meetups: array(meetupSchema),
     hiddenPlaces: optional(array(string())),
+    savedPlaces: optional(array(savedChoiceSchema)),
+    savedActivities: optional(array(savedChoiceSchema)),
   }),
   check(everyoneIsKnown),
 )
@@ -97,34 +104,51 @@ export function parseBackup(text: string): Backup {
 }
 
 export async function exportBackup(now: number): Promise<Backup> {
-  const [people, groups, meetups, hiddenPlaces] = await Promise.all([
+  const [people, groups, meetups, savedPlaces, savedActivities] = await Promise.all([
     db.people.toArray(),
     db.groups.toArray(),
     db.meetups.orderBy('date').toArray(),
-    db.hiddenPlaces.toCollection().primaryKeys(),
+    db.savedPlaces.toArray(),
+    db.savedActivities.toArray(),
   ])
 
 
-  return { version: 1, exportedAt: now, people, groups, meetups, hiddenPlaces }
+  return { version: 1, exportedAt: now, people, groups, meetups, savedPlaces, savedActivities }
 }
 
 const countInvalid = (records: unknown[], schema: GenericSchema) =>
   records.filter((record) => !safeParse(schema, record).success).length
 
 export function countBadRecords(fileText: string): number {
-  const { people, groups, meetups } = JSON.parse(fileText)
+  const { people, groups, meetups, savedPlaces = [], savedActivities = [] } = JSON.parse(fileText)
 
-  return countInvalid(people, personSchema) + countInvalid(groups, groupSchema) + countInvalid(meetups, meetupSchema)
+  return (
+    countInvalid(people, personSchema) +
+    countInvalid(groups, groupSchema) +
+    countInvalid(meetups, meetupSchema) +
+    countInvalid(savedPlaces, savedChoiceSchema) +
+    countInvalid(savedActivities, savedChoiceSchema)
+  )
 }
 
-export async function restoreBackup({ people, groups, meetups, hiddenPlaces = [] }: Backup): Promise<void> {
-  await db.transaction('rw', db.people, db.groups, db.meetups, db.hiddenPlaces, async () => {
-    await Promise.all([db.people.clear(), db.groups.clear(), db.meetups.clear(), db.hiddenPlaces.clear()])
+export async function restoreBackup(backup: Backup): Promise<void> {
+  const { people, groups, meetups, hiddenPlaces = [], savedPlaces, savedActivities } = backup
+  const chipsTheFileShowed = initialSavedLists(meetups, hiddenPlaces)
+
+  await db.transaction('rw', [db.people, db.groups, db.meetups, db.savedPlaces, db.savedActivities], async () => {
+    await Promise.all([
+      db.people.clear(),
+      db.groups.clear(),
+      db.meetups.clear(),
+      db.savedPlaces.clear(),
+      db.savedActivities.clear(),
+    ])
     await Promise.all([
       db.people.bulkPut(people),
       db.groups.bulkPut(groups),
       db.meetups.bulkPut(meetups),
-      db.hiddenPlaces.bulkPut(hiddenPlaces.map((place) => ({ place }))),
+      db.savedPlaces.bulkPut(savedPlaces ?? chipsTheFileShowed.places),
+      db.savedActivities.bulkPut(savedActivities ?? chipsTheFileShowed.activities),
     ])
   })
 }

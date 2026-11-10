@@ -1,3 +1,5 @@
+import type { ChoiceKind } from '../domain/types'
+
 export const COMMON_COPY = {
   calendar: 'לוח שנה',
   friends: 'חברים',
@@ -12,6 +14,14 @@ export const COMMON_COPY = {
   rename: 'שינוי שם',
   name: 'שם',
   nameTaken: (name: string) => `כבר יש חבר בשם ${name}`,
+  choiceTaken: {
+    place: (name: string) => `כבר יש מקום בשם „${name}”`,
+    activity: (name: string) => `כבר יש פעילות בשם „${name}”`,
+  } satisfies Record<ChoiceKind, (name: string) => string>,
+  choiceRemoved: {
+    place: (name: string) => `המקום „${name}” הוסר מהמקומות השמורים`,
+    activity: (name: string) => `הפעילות „${name}” הוסרה מהפעילויות השמורות`,
+  } satisfies Record<ChoiceKind, (name: string) => string>,
   hiddenFromOrbit: 'מוסתר מהמסלול',
   showInOrbit: 'הצגה במסלול',
   exportBackup: 'ייצוא גיבוי',

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { MEETUP_COPY } from '../../copy/meetup'
-import type { Group, Meetup, Person } from '../../domain/types'
+import { inSavedOrder, placesByLastUse } from '../../domain/choices'
+import type { Group, Meetup, Person, SavedChoice } from '../../domain/types'
 import { DatePanel } from './DatePanel'
 import { DurationPanel } from './DurationPanel'
 import { ExtrasPanel } from './ExtrasPanel'
@@ -8,7 +8,6 @@ import { completeDraft, type DraftFields, type Step } from './meetupDraft'
 import { PeoplePanel } from './PeoplePanel'
 import { PlacePanel } from './PlacePanel'
 import { RatingPanel } from './RatingPanel'
-import { ownActivities, recentPlaces } from './recentChoices'
 import { Sentence } from './Sentence'
 import type { useLogActions } from './useLogActions'
 import { useMeetupDraft } from './useMeetupDraft'
@@ -20,7 +19,8 @@ interface MeetupFormProps {
   people: Person[]
   groups: Group[]
   meetups: Meetup[]
-  hiddenPlaces: string[]
+  savedPlaces: SavedChoice[]
+  savedActivities: SavedChoice[]
   actions: ReturnType<typeof useLogActions>
 }
 
@@ -31,7 +31,8 @@ export function MeetupForm({
   people,
   groups,
   meetups,
-  hiddenPlaces,
+  savedPlaces,
+  savedActivities,
   actions,
 }: MeetupFormProps) {
   const { draft, step, update, fill, open } = useMeetupDraft(initial)
@@ -60,7 +61,7 @@ export function MeetupForm({
     place: () => (
       <PlacePanel
         place={draft.place}
-        recentPlaces={recentPlaces(meetups, hiddenPlaces)}
+        savedPlaces={placesByLastUse(savedPlaces, meetups)}
         onChange={(place) => update({ place })}
         onPick={(place) => fill({ place })}
         onNext={() => fill()}
@@ -71,10 +72,10 @@ export function MeetupForm({
     extras: () => (
       <ExtrasPanel
         extras={draft}
-        ownActivities={ownActivities(meetups, MEETUP_COPY.activityPresets)}
+        savedActivities={inSavedOrder(savedActivities)}
         saving={actions.saving}
         onChange={update}
-        onSave={() => complete && void actions.saveMeetup(complete)}
+        onSave={(activities) => complete && void actions.saveMeetup({ ...complete, activities })}
         onDelete={meetupId ? () => actions.confirmDelete(meetupId) : undefined}
       />
     ),

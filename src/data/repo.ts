@@ -102,36 +102,19 @@ export async function saveGroup(name: string, memberIds: string[]): Promise<Grou
 export async function addMeetup(draft: MeetupDraft): Promise<string> {
   const meetup: Meetup = { ...cleanDraft(draft), id: newId(), createdAt: Date.now() }
 
-  await db.transaction('rw', db.meetups, db.hiddenPlaces, async () => {
-    await db.meetups.add(meetup)
-    await showPlace(meetup.place)
-  })
+  await db.meetups.add(meetup)
 
   return meetup.id
 }
 
 export async function updateMeetup(id: string, draft: MeetupDraft) {
-  await db.transaction('rw', db.meetups, db.hiddenPlaces, async () => {
+  await db.transaction('rw', db.meetups, async () => {
     const existing = await db.meetups.get(id)
 
     if (existing) {
-      const cleaned = cleanDraft(draft)
-
-      await db.meetups.put({ ...cleaned, id, createdAt: existing.createdAt })
-
-      if (cleaned.place !== existing.place) {
-        await showPlace(cleaned.place)
-      }
+      await db.meetups.put({ ...cleanDraft(draft), id, createdAt: existing.createdAt })
     }
   })
-}
-
-export async function hidePlace(place: string) {
-  await db.hiddenPlaces.put({ place })
-}
-
-export async function showPlace(place: string) {
-  await db.hiddenPlaces.delete(place)
 }
 
 export async function deleteMeetup(id: string) {
@@ -143,5 +126,3 @@ export const allPeople = () => db.people.orderBy('name').toArray()
 export const allGroups = () => db.groups.toArray()
 
 export const allMeetups = () => db.meetups.orderBy('date').toArray()
-
-export const allHiddenPlaces = () => db.hiddenPlaces.toCollection().primaryKeys()

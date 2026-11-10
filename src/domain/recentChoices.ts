@@ -1,5 +1,5 @@
-import { newestFirst } from '../../domain/person'
-import type { Meetup } from '../../domain/types'
+import { newestFirst } from './person'
+import type { Meetup } from './types'
 
 export const RECENT_PLACES_LIMIT = 6
 

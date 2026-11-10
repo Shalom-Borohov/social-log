@@ -39,4 +39,11 @@ export interface HiddenPlace {
   place: string
 }
 
+export interface SavedChoice {
+  name: string
+  savedAt: number
+}
+
+export type ChoiceKind = 'place' | 'activity'
+
 export type MeetupDraft = Omit<Meetup, 'id' | 'createdAt'>

@@ -3,20 +3,18 @@ import {
   addMeetup,
   addPerson,
   allGroups,
-  allHiddenPlaces,
   allMeetups,
   allPeople,
   deleteGroup,
   deleteMeetup,
-  hidePlace,
   NameTakenError,
   renameGroup,
   renamePerson,
   saveGroup,
   setPersonHidden,
-  showPlace,
   updateMeetup,
 } from '../../src/data/repo'
+import { allSavedChoices } from '../../src/data/savedChoices'
 import type { MeetupDraft } from '../../src/domain/types'
 import { resetDb } from '../helpers/db'
 
@@ -98,37 +96,14 @@ describe('repo', () => {
     expect(await allMeetups()).toEqual([])
   })
 
-  it('hides and shows a place', async () => {
-    await hidePlace('בטיילת')
-    await hidePlace('אצל נועם')
-    await showPlace('בטיילת')
+  it('saves no place or activity just because a meetup used it', async () => {
+    const placesBefore = await allSavedChoices('place')
+    const activitiesBefore = await allSavedChoices('activity')
+    const id = await addMeetup({ ...walk, place: 'בבית של נועם', activities: ['שש-בש'] })
 
-    expect(await allHiddenPlaces()).toEqual(['אצל נועם'])
-  })
+    await updateMeetup(id, { ...walk, place: 'בים', activities: ['פינג פונג'] })
 
-  it('shows a hidden place again once a meetup is added there', async () => {
-    await hidePlace('בטיילת')
-
-    await addMeetup({ ...walk, place: ' בטיילת ' })
-
-    expect(await allHiddenPlaces()).toEqual([])
-  })
-
-  it('shows a hidden place again once a meetup is edited to it', async () => {
-    const id = await addMeetup({ ...walk, place: 'בבית' })
-
-    await hidePlace('בטיילת')
-    await updateMeetup(id, { ...walk, place: 'בטיילת ' })
-
-    expect(await allHiddenPlaces()).toEqual([])
-  })
-
-  it('keeps a place hidden when a meetup already there is edited', async () => {
-    const id = await addMeetup({ ...walk, place: 'בטיילת' })
-
-    await hidePlace('בטיילת')
-    await updateMeetup(id, { ...walk, place: 'בטיילת', rating: 1 })
-
-    expect(await allHiddenPlaces()).toEqual(['בטיילת'])
+    expect(await allSavedChoices('place')).toEqual(placesBefore)
+    expect(await allSavedChoices('activity')).toEqual(activitiesBefore)
   })
 })
