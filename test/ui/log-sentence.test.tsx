@@ -143,6 +143,19 @@ describe('the date', () => {
 
     expect(await slot('מתי')).toHaveAccessibleName('מתי: ביום חמישי 5.11')
   })
+
+  it('starts on the day it was opened for', async () => {
+    renderAt('/log?date=2026-11-05')
+
+    expect(await slot('מתי')).toHaveAccessibleName('מתי: ביום חמישי 5.11')
+    expect(await slot('מי')).toHaveAttribute('aria-current', 'step')
+  })
+
+  it.each(['2026-11-09', '2026-02-30', 'yesterday', ''])('starts on today when opened for %j', async (date) => {
+    renderAt(`/log?date=${date}`)
+
+    expect(await slot('מתי')).toHaveAccessibleName('מתי: היום')
+  })
 })
 
 describe('the day rollover', () => {

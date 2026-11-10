@@ -5,6 +5,8 @@ export const slot = (role: string) =>
 
 export const findButton = (name: string) => screen.findByRole('button', { name })
 
+export const pressed = async (name: string) => (await findButton(name)).getAttribute('aria-pressed')
+
 export async function tap(name: string) {
   fireEvent.click(await findButton(name))
 }

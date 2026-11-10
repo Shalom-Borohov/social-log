@@ -35,4 +35,8 @@ export interface Meetup {
   createdAt: number
 }
 
+export interface HiddenPlace {
+  place: string
+}
+
 export type MeetupDraft = Omit<Meetup, 'id' | 'createdAt'>

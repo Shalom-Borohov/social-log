@@ -3,9 +3,9 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { db } from '../../src/data/db'
 import { freezeDate } from '../helpers/clock'
 import { resetDb } from '../helpers/db'
-import { findButton, slot, tap, typeInto } from '../helpers/log'
+import { findButton, pressed, slot, tap, typeInto } from '../helpers/log'
 import { aGroup, aPerson } from '../helpers/meetups'
-import { alertShown, clickAlertButton, typeInAlert } from '../helpers/overlays'
+import { alertShown, clickAlertButton, clickToastButton, toasts, typeInAlert } from '../helpers/overlays'
 import { renderAt } from '../helpers/renderAt'
 
 const tamar = aPerson({ id: 'tamar', name: 'תמר' })
@@ -15,8 +15,6 @@ const maya = aPerson({ id: 'maya', name: 'מאיה' })
 const noam = aPerson({ id: 'noam', name: 'נועם' })
 
 const army = aGroup({ id: 'army', name: 'החבר׳ה מהצבא', memberIds: ['tamar', 'maya', 'noam'] })
-
-const pressed = async (name: string) => (await findButton(name)).getAttribute('aria-pressed')
 
 describe('מי', () => {
   beforeEach(async () => {
@@ -126,6 +124,75 @@ describe('מי', () => {
     await tap('הוספה')
 
     expect(await pressed('דנה')).toBe('true')
+  })
+
+  it('hides an unpicked person from the chips in עריכה, and ביטול brings them back', async () => {
+    renderAt('/log')
+    await tap('תמר')
+
+    await tap('עריכה')
+
+    expect(await findButton('סיום')).not.toHaveAttribute('aria-pressed')
+    expect(await pressed('תמר')).toBe('true')
+    expect(await findButton('תמר')).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'הסתרה: תמר' })).not.toBeInTheDocument()
+
+    await tap('הסתרה: נועם')
+
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'הסתרה: נועם' })).not.toBeInTheDocument())
+    expect((await db.people.get('noam'))?.hidden).toBe(true)
+    await waitFor(() => expect(toasts()).toContain('הסתרת את נועם מהרשימה ומהמסלול'))
+
+    clickToastButton('ביטול')
+
+    expect(await findButton('הסתרה: נועם')).toBeInTheDocument()
+    expect((await db.people.get('noam'))?.hidden).toBe(false)
+  })
+
+  it('offers עריכה only while someone is left unpicked', async () => {
+    renderAt('/log')
+    await tap('תמר')
+    await tap('מאיה')
+
+    expect(await findButton('עריכה')).not.toHaveAttribute('aria-pressed')
+
+    await tap('נועם')
+
+    expect(screen.queryByRole('button', { name: 'עריכה' })).not.toBeInTheDocument()
+  })
+
+  it('keeps סיום after the last unpicked person is hidden, and unlocks the picked chips with it', async () => {
+    renderAt('/log')
+    await tap('תמר')
+    await tap('מאיה')
+    await tap('עריכה')
+
+    await tap('הסתרה: נועם')
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'הסתרה: נועם' })).not.toBeInTheDocument())
+
+    expect(await findButton('תמר')).toBeDisabled()
+
+    await tap('סיום')
+
+    expect(await findButton('תמר')).toBeEnabled()
+  })
+
+  it('locks the group chips while עריכה is on', async () => {
+    await db.groups.put(army)
+    renderAt('/log')
+    await tap('תמר')
+
+    await tap('עריכה')
+
+    expect(await findButton('החבר׳ה מהצבא')).toBeDisabled()
+  })
+
+  it('offers no עריכה before anyone was added', async () => {
+    await resetDb()
+    renderAt('/log')
+
+    expect(await screen.findByLabelText('שם חדש')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'עריכה' })).not.toBeInTheDocument()
   })
 
   it('offers שמירה כקבוצה from two people and saves the group with its name', async () => {

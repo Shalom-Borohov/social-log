@@ -3,15 +3,18 @@ import {
   addMeetup,
   addPerson,
   allGroups,
+  allHiddenPlaces,
   allMeetups,
   allPeople,
   deleteGroup,
   deleteMeetup,
+  hidePlace,
   NameTakenError,
   renameGroup,
   renamePerson,
   saveGroup,
   setPersonHidden,
+  showPlace,
   updateMeetup,
 } from '../../src/data/repo'
 import type { MeetupDraft } from '../../src/domain/types'
@@ -93,5 +96,39 @@ describe('repo', () => {
     await deleteMeetup(id)
 
     expect(await allMeetups()).toEqual([])
+  })
+
+  it('hides and shows a place', async () => {
+    await hidePlace('בטיילת')
+    await hidePlace('אצל נועם')
+    await showPlace('בטיילת')
+
+    expect(await allHiddenPlaces()).toEqual(['אצל נועם'])
+  })
+
+  it('shows a hidden place again once a meetup is added there', async () => {
+    await hidePlace('בטיילת')
+
+    await addMeetup({ ...walk, place: ' בטיילת ' })
+
+    expect(await allHiddenPlaces()).toEqual([])
+  })
+
+  it('shows a hidden place again once a meetup is edited to it', async () => {
+    const id = await addMeetup({ ...walk, place: 'בבית' })
+
+    await hidePlace('בטיילת')
+    await updateMeetup(id, { ...walk, place: 'בטיילת ' })
+
+    expect(await allHiddenPlaces()).toEqual([])
+  })
+
+  it('keeps a place hidden when a meetup already there is edited', async () => {
+    const id = await addMeetup({ ...walk, place: 'בטיילת' })
+
+    await hidePlace('בטיילת')
+    await updateMeetup(id, { ...walk, place: 'בטיילת', rating: 1 })
+
+    expect(await allHiddenPlaces()).toEqual(['בטיילת'])
   })
 })

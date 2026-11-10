@@ -16,4 +16,9 @@ export const personPath = (personId: string) => `${FRIENDS_PATH}/person/${person
 
 export const NEW_MEETUP_PATH = '/log'
 
+export const MEETUP_DATE_PARAM = 'date'
+
+export const newMeetupOnDayPath = (date: string) =>
+  `${NEW_MEETUP_PATH}?${new URLSearchParams({ [MEETUP_DATE_PARAM]: date })}`
+
 export const editMeetupPath = (meetupId: string) => `${NEW_MEETUP_PATH}/${meetupId}`
