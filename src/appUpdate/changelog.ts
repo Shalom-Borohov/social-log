@@ -2,8 +2,18 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
-    version: '1.3.0',
+    version: '1.4.0',
     features: ['כשאותם חברים חוזרים בכמה מפגשים, מוצע לשמור אותם כקבוצה'],
+    fixes: [],
+  },
+  {
+    version: '1.3.1',
+    features: [],
+    fixes: ['שם האפליקציה הוא עכשיו מפגשים'],
+  },
+  {
+    version: '1.3.0',
+    features: ['בלוח עוברים בין תקופות בהחלקה, בלי סרגל הקודם/הבא'],
     fixes: [],
   },
   {
