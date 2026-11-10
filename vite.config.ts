@@ -16,8 +16,8 @@ export default defineConfig(({ mode }) => ({
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'נפגשנו',
-        short_name: 'נפגשנו',
+        name: 'מפגשים',
+        short_name: 'מפגשים',
         lang: 'he',
         dir: 'rtl',
         display: 'standalone',

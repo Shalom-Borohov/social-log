@@ -1,10 +1,10 @@
-# נפגשנו — Social Meetup Log PWA Design
+# מפגשים — Social Meetup Log PWA Design
 
 Personal iPhone PWA for logging meetups with friends: who, when, where, how long and how it went. The main screen is a rolling calendar coloured by how each day's meetups went, a second tab shows friends in an orbit by how long since you last met, and a meetup is logged by filling in a sentence. Sibling of תפילות (`~/Personal/prayer-log`). Design canvas: https://claude.ai/artifact/Rj6WfdddijRwGoLbbhtWsh (page "Your combination", row "New colours", logging look A).
 
 ## Decisions (from grilling, 2026-11-08)
 
-1. **Name:** נפגשנו. Repo and folder: `social-log` (the user kept it over `friends-log`). Why: a past-tense verb like סיימתי that matches the logging sentence.
+1. **Name:** מפגשים (changed 2026-11-10 from נפגשנו). Repo and folder: `social-log` (the user kept it over `friends-log`). Why: a plain plural of what is logged, like the sibling apps אימונים and תפילות, and the word the app already uses for a meetup.
 2. **Layout:** two tabs, לוח שנה (main) · חברים, plus a round + button beside them that opens the logging sentence. Why: the user wants their rhythm first and who they're drifting from second.
 3. **Groups:** saved groups are shortcuts that fill in their members; a meetup always records the people who actually came, and the group is remembered only for wording the sentence. Orbit is per person. Why: Orbit can then say "you haven't seen Itay alone", and absent members don't look present.
 4. **Rating:** required, one tap, four levels: מעולה · טוב · סביר · לא משהו. Why: every logged day gets a colour, so the calendar never needs a fifth "no rating" look.
