@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ownActivities, recentPlaces } from '../../src/pages/log/recentChoices'
+import { ownActivities, recentPlaces } from '../../src/domain/recentChoices'
 import { aMeetup } from '../helpers/meetups'
 
 describe('recentPlaces', () => {

@@ -2,7 +2,7 @@ import { IonContent, IonIcon } from '@ionic/react'
 import { close } from 'ionicons/icons'
 import { useState } from 'react'
 import { COMMON_COPY } from '../../copy/common'
-import { useGroups, useHiddenPlaces, useMeetups, usePeople } from '../../data/hooks'
+import { useGroups, useMeetups, usePeople, useSavedChoices } from '../../data/hooks'
 import type { Meetup } from '../../domain/types'
 import { useToday } from '../../hooks/useToday'
 import { LOG_COPY } from './copy'
@@ -22,7 +22,8 @@ export function LogScreen({ meetupId, requestedDate }: LogScreenProps) {
   const meetups = useMeetups()
   const people = usePeople() ?? []
   const groups = useGroups() ?? []
-  const hiddenPlaces = useHiddenPlaces() ?? []
+  const savedPlaces = useSavedChoices('place') ?? []
+  const savedActivities = useSavedChoices('activity') ?? []
   const actions = useLogActions(meetupId)
   const found = meetups?.find((meetup) => meetup.id === meetupId)
   const [opened, setOpened] = useState<Meetup>()
@@ -41,7 +42,8 @@ export function LogScreen({ meetupId, requestedDate }: LogScreenProps) {
       people={people}
       groups={groups}
       meetups={meetups ?? []}
-      hiddenPlaces={hiddenPlaces}
+      savedPlaces={savedPlaces}
+      savedActivities={savedActivities}
       actions={actions}
     />
   )

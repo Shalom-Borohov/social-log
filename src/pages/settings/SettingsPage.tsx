@@ -29,6 +29,7 @@ import { SETTINGS_COPY } from './copy'
 import { FeedbackSettings } from './FeedbackSettings'
 import { GroupsSettings } from './GroupsSettings'
 import { HiddenPeopleSettings } from './HiddenPeopleSettings'
+import { SavedChoicesSettings } from './SavedChoicesSettings'
 import { VersionSettings } from './VersionSettings'
 
 export function SettingsPage() {
@@ -87,6 +88,8 @@ export function SettingsPage() {
         </IonNote>
         <IonNote className="list-footer">{SETTINGS_COPY.storageNote}</IonNote>
         <GroupsSettings />
+        <SavedChoicesSettings kind="place" />
+        <SavedChoicesSettings kind="activity" />
         <HiddenPeopleSettings />
         <FeedbackSettings />
         <VersionSettings />

@@ -35,7 +35,12 @@ export const sheetButton = (text: string) => buttonIn('ion-action-sheet', '.acti
 export const clickSheetButton = (text: string) => fireEvent.click(sheetButton(text))
 
 const overlayEvent = (
-  name: 'ionActionSheetDidPresent' | 'ionActionSheetDidDismiss' | 'ionAlertDidPresent' | 'ionAlertDidDismiss',
+  name:
+    | 'ionActionSheetDidPresent'
+    | 'ionActionSheetDidDismiss'
+    | 'ionAlertDidPresent'
+    | 'ionAlertDidDismiss'
+    | 'ionToastDidPresent',
 ) =>
   new Promise((resolve) => {
     document.addEventListener(name, resolve, { once: true })
@@ -49,7 +54,11 @@ export const alertShown = () => overlayEvent('ionAlertDidPresent')
 
 export const alertDismissed = () => overlayEvent('ionAlertDidDismiss')
 
+export const toastPresented = () => overlayEvent('ionToastDidPresent')
+
 export const alertHeader = () => last('ion-alert .alert-title').textContent
+
+export const alertMessage = () => last('ion-alert .alert-message').textContent
 
 export const typeInAlert = (value: string) => fireEvent.input(last('ion-alert input'), { target: { value } })
 

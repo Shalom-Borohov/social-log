@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { db } from '../../src/data/db'
+import { saveChoices } from '../../src/data/savedChoices'
 import { chooseBackupFile, chooseUnreadableBackupFile } from '../helpers/backupFile'
 import { freezeDate } from '../helpers/clock'
 import { resetDb } from '../helpers/db'
@@ -10,6 +11,8 @@ import { toasts } from '../helpers/overlays'
 import { renderAt } from '../helpers/renderAt'
 
 const SETTINGS = '/tabs/calendar/settings'
+
+const NOW = new Date(2026, 10, 8, 9, 30).getTime()
 
 const noam = aPerson({ id: 'noam', name: 'נועם' })
 
@@ -49,15 +52,17 @@ const storedData = async () => ({
 
 describe('settings', () => {
   beforeEach(resetDb)
-  freezeDate(new Date(2026, 10, 8, 9, 30).getTime())
+  freezeDate(NOW)
 
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
-  it('exports a backup with people, groups, meetups and hidden places through the share sheet', async () => {
+  it('exports a backup with people, groups, meetups and the saved places and activities through the share sheet', async () => {
     await storeSample()
-    await db.hiddenPlaces.put({ place: 'בבית' })
+    await db.savedActivities.clear()
+    await saveChoices('place', ['בים'])
+    await saveChoices('activity', ['טיול'])
 
     const share = vi.fn<(data: ShareData) => Promise<void>>().mockResolvedValue()
 
@@ -73,11 +78,12 @@ describe('settings', () => {
     expect(files?.[0].name).toMatch(/-backup-2026-11-08\.json$/)
     expect(await readJson(files?.[0])).toEqual({
       version: 1,
-      exportedAt: new Date(2026, 10, 8, 9, 30).getTime(),
+      exportedAt: NOW,
       people: [noam],
       groups: [army],
       meetups: [walk],
-      hiddenPlaces: ['בבית'],
+      savedPlaces: [{ name: 'בים', savedAt: NOW }],
+      savedActivities: [{ name: 'טיול', savedAt: NOW }],
     })
   })
 

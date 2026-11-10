@@ -5,7 +5,7 @@ import { db } from '../../src/data/db'
 import { stubShare } from '../helpers/backupFile'
 import { resetDb } from '../helpers/db'
 import { aMeetup, aPerson } from '../helpers/meetups'
-import { alertShown, toasts } from '../helpers/overlays'
+import { alertMessage, alertShown, toasts } from '../helpers/overlays'
 import { renderAt } from '../helpers/renderAt'
 
 const unratedMeetup = JSON.parse(
@@ -29,8 +29,6 @@ async function exportUntilAlert() {
   fireEvent.click(button)
   await shown
 }
-
-const alertMessage = () => document.querySelector('ion-alert .alert-message')?.textContent
 
 describe('exporting a backup', () => {
   beforeEach(resetDb)
