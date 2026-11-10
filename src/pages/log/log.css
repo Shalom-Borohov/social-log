@@ -236,7 +236,8 @@
 .log-chip:focus-visible,
 .log-rating:focus-visible,
 .log-main-action:focus-visible,
-.log-close:focus-visible {
+.log-close:focus-visible,
+.log-edit-toggle:focus-visible {
   outline: 3px solid var(--app-ink);
   outline-offset: 2px;
 }

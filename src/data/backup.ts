@@ -21,7 +21,14 @@ import { isIsoDate, logicalToday, MINUTES_PER_HOUR } from '../domain/logicalDay'
 import { type Group, INITIATORS, type Meetup, type Person, RATINGS } from '../domain/types'
 import { db } from './db'
 
-export type Backup = { version: 1; exportedAt: number; people: Person[]; groups: Group[]; meetups: Meetup[] }
+export type Backup = {
+  version: 1
+  exportedAt: number
+  people: Person[]
+  groups: Group[]
+  meetups: Meetup[]
+  hiddenPlaces?: string[]
+}
 
 const isNotInTheFuture = (date: string) => date <= logicalToday(Date.now())
 
@@ -66,6 +73,7 @@ const backupSchema = pipe(
     people: array(personSchema),
     groups: array(groupSchema),
     meetups: array(meetupSchema),
+    hiddenPlaces: optional(array(string())),
   }),
   check(everyoneIsKnown),
 )
@@ -89,14 +97,15 @@ export function parseBackup(text: string): Backup {
 }
 
 export async function exportBackup(now: number): Promise<Backup> {
-  const [people, groups, meetups] = await Promise.all([
+  const [people, groups, meetups, hiddenPlaces] = await Promise.all([
     db.people.toArray(),
     db.groups.toArray(),
     db.meetups.orderBy('date').toArray(),
+    db.hiddenPlaces.toCollection().primaryKeys(),
   ])
 
 
-  return { version: 1, exportedAt: now, people, groups, meetups }
+  return { version: 1, exportedAt: now, people, groups, meetups, hiddenPlaces }
 }
 
 const countInvalid = (records: unknown[], schema: GenericSchema) =>
@@ -108,9 +117,14 @@ export function countBadRecords(fileText: string): number {
   return countInvalid(people, personSchema) + countInvalid(groups, groupSchema) + countInvalid(meetups, meetupSchema)
 }
 
-export async function restoreBackup(backup: Backup): Promise<void> {
-  await db.transaction('rw', db.people, db.groups, db.meetups, async () => {
-    await Promise.all([db.people.clear(), db.groups.clear(), db.meetups.clear()])
-    await Promise.all([db.people.bulkPut(backup.people), db.groups.bulkPut(backup.groups), db.meetups.bulkPut(backup.meetups)])
+export async function restoreBackup({ people, groups, meetups, hiddenPlaces = [] }: Backup): Promise<void> {
+  await db.transaction('rw', db.people, db.groups, db.meetups, db.hiddenPlaces, async () => {
+    await Promise.all([db.people.clear(), db.groups.clear(), db.meetups.clear(), db.hiddenPlaces.clear()])
+    await Promise.all([
+      db.people.bulkPut(people),
+      db.groups.bulkPut(groups),
+      db.meetups.bulkPut(meetups),
+      db.hiddenPlaces.bulkPut(hiddenPlaces.map((place) => ({ place }))),
+    ])
   })
 }

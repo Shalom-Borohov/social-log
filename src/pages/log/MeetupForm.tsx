@@ -20,10 +20,20 @@ interface MeetupFormProps {
   people: Person[]
   groups: Group[]
   meetups: Meetup[]
+  hiddenPlaces: string[]
   actions: ReturnType<typeof useLogActions>
 }
 
-export function MeetupForm({ initial, meetupId, today, people, groups, meetups, actions }: MeetupFormProps) {
+export function MeetupForm({
+  initial,
+  meetupId,
+  today,
+  people,
+  groups,
+  meetups,
+  hiddenPlaces,
+  actions,
+}: MeetupFormProps) {
   const { draft, step, update, fill, open } = useMeetupDraft(initial)
   const complete = completeDraft(draft)
 
@@ -50,7 +60,7 @@ export function MeetupForm({ initial, meetupId, today, people, groups, meetups, 
     place: () => (
       <PlacePanel
         place={draft.place}
-        recentPlaces={recentPlaces(meetups)}
+        recentPlaces={recentPlaces(meetups, hiddenPlaces)}
         onChange={(place) => update({ place })}
         onPick={(place) => fill({ place })}
         onNext={() => fill()}

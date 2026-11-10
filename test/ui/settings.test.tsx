@@ -55,8 +55,9 @@ describe('settings', () => {
     vi.restoreAllMocks()
   })
 
-  it('exports a backup with people, groups and meetups through the share sheet', async () => {
+  it('exports a backup with people, groups, meetups and hidden places through the share sheet', async () => {
     await storeSample()
+    await db.hiddenPlaces.put({ place: 'בבית' })
 
     const share = vi.fn<(data: ShareData) => Promise<void>>().mockResolvedValue()
 
@@ -76,6 +77,7 @@ describe('settings', () => {
       people: [noam],
       groups: [army],
       meetups: [walk],
+      hiddenPlaces: ['בבית'],
     })
   })
 

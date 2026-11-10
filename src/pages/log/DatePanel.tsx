@@ -1,4 +1,4 @@
-import { addDays, isIsoDate } from '../../domain/logicalDay'
+import { addDays, isLoggableDate } from '../../domain/logicalDay'
 import { RECENT_DAY_WORDS } from '../../domain/sentence'
 import { LOG_COPY } from './copy'
 import { Chip, ChipGroup, MainAction, Panel } from './Panel'
@@ -13,7 +13,7 @@ interface DatePanelProps {
 
 export function DatePanel({ date, today, onChange, onPick, onNext }: DatePanelProps) {
   function changeDate(value: string) {
-    if (isIsoDate(value) && value <= today) {
+    if (isLoggableDate(value, today)) {
       onChange(value)
     }
   }

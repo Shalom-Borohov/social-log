@@ -10,6 +10,7 @@ import { useToday } from '../../hooks/useToday'
 import { BackupReminderRow } from './BackupReminderRow'
 import { CalendarRange } from './CalendarRange'
 import { CALENDAR_COPY } from './copy'
+import { useTappedDay } from './useTappedDay'
 import './calendar.css'
 
 const THIS_PAGE = 0
@@ -19,6 +20,7 @@ export function CalendarPage() {
   const meetups = useMeetups()
   const people = usePeople()
   const groups = useGroups()
+  const { forgetTappedDay } = useTappedDay()
   const [pagesBack, setPagesBack] = useState(THIS_PAGE)
   const range = rollingWeeks(today, pagesBack)
 
@@ -27,9 +29,14 @@ export function CalendarPage() {
       ? CALENDAR_COPY.lastWeeks(WEEKS_SHOWN)
       : CALENDAR_COPY.range(gregorianLabel(range.from), gregorianLabel(range.to))
 
+  const pageBy = (pages: number) => {
+    forgetTappedDay()
+    setPagesBack((current) => current + pages)
+  }
+
   const period = {
-    onPrevious: () => setPagesBack((pages) => pages + 1),
-    onNext: () => setPagesBack((pages) => pages - 1),
+    onPrevious: () => pageBy(1),
+    onNext: () => pageBy(-1),
     nextDisabled: pagesBack === THIS_PAGE,
   }
 
