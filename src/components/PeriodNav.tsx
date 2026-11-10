@@ -1,6 +1,8 @@
 import { IonButton, IonButtons, IonFooter, IonIcon, IonToolbar } from '@ionic/react'
 import { chevronBack, chevronForward } from 'ionicons/icons'
+import type { RefObject } from 'react'
 import { COMMON_COPY } from '../copy/common'
+import { useContentBelow } from '../hooks/useContentBelow'
 import './PeriodNav.css'
 
 interface PeriodNavProps {
@@ -9,11 +11,15 @@ interface PeriodNavProps {
   onPrevious: () => void
   onNext: () => void
   nextDisabled: boolean
+  areaRef: RefObject<HTMLIonContentElement | null>
+  paneRef: RefObject<HTMLElement | null>
 }
 
-export function PeriodNav({ previousLabel, nextLabel, onPrevious, onNext, nextDisabled }: PeriodNavProps) {
+export function PeriodNav({ previousLabel, nextLabel, onPrevious, onNext, nextDisabled, areaRef, paneRef }: PeriodNavProps) {
+  const solid = useContentBelow(areaRef, paneRef)
+
   return (
-    <IonFooter className="period-nav">
+    <IonFooter className={solid ? 'period-nav period-nav-solid' : 'period-nav'}>
       <IonToolbar>
         <IonButtons slot="start">
           <IonButton aria-label={previousLabel} onClick={onPrevious}>

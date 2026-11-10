@@ -4,6 +4,10 @@ ion-tabs {
   --new-meetup-size: 60px;
 }
 
+ion-tabs > ion-router-outlet {
+  overflow: hidden;
+}
+
 .pill-tab-bar {
   --background: var(--app-surface);
   --border: 0;

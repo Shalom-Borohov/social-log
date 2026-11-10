@@ -33,6 +33,14 @@ Personal iPhone PWA for logging meetups with friends: who, when, where, how long
     - Tapping an empty day selects it and says it has no meetups. The hours tile rounds to one decimal.
     - Exactly 7 days ago is still the inner ring (השבוע); exactly 30 days ago is still the middle ring.
     - The place step offers up to 6 past places, most recent first.
+20. **Period bar and tab pages (added 2026-11-10, clarifies 6):** a tab page ends at the tab bar, so nothing shows around the floating tab bar or the + button. The ‹ › bar under the calendar has the page's colour while nothing is under it, and turns surface with a hairline while content (not just the empty space at the end) scrolls under it, including when tapping a day grows the list or a row appears above the grid. It switches at once, with no fade, because its state follows the content's height as well as the scroll position. Why: the bar looked like a layer over the calendar with the stats showing through around it (#3).
+21. **Sheet look (added 2026-11-10, clarifies 12):** the באג / הצעה choice uses the tab bar's pill: a card-coloured track, an ink thumb and a bold label on ink. In dark mode sheets are navy (surface `#1C2238`, cards `#2A3152`, header the sheet's colour). Why: the default iOS thumb had the sheet's own colour and read as a hole, and dark sheets fell back to Ionic's neutral grey (#2).
+22. **iOS Safari screenshots (added 2026-11-10, extends assumption 1):** the `ios-screenshot.yml` workflow, copied from תפילות, shows how a branch looks in iOS Safari without the phone. Why: #2 and #3 were found on the phone and could only be checked in Chromium.
+    - It runs by hand from the Actions tab on the branch picked under "Use workflow from", and on PRs that edit it.
+    - It builds the branch on the `xcode-27` runner and opens `/social-log/` in Safari on an iPhone SE (2nd generation), in Hebrew with the Israel region and on Israel time, with a light and a dark screenshot.
+    - Before opening the app, the run marks the branch's version as seen, so the calendar shows and not מה חדש. Only the CI build gets the page that does this.
+    - The simulator can only open a page: it can't tap or scroll, so the screenshots show the calendar as it first opens, with no meetups. Sheets and scrolled states are still checked on the phone.
+    - The screenshots show a Safari tab, not the Home Screen app.
 
 ## Assumptions (accepted by the user)
 
@@ -75,6 +83,7 @@ Dark (validated 2026-11-08 against surface `#1C2238`; colour-blind and normal-vi
 | Token | Hex | Contrast |
 |---|---|---|
 | ground / surface / ink / muted | `#0F1324` / `#1C2238` / `#EEF1FA` / `#A9B0C8` | ink 13.9:1, muted 7.3:1 on surface |
+| sheet / sheet card | `#1C2238` / `#2A3152` | ink 11.2:1, muted 5.9:1 on sheet card (added 2026-11-10, decision 21) |
 | great | `#8C95FF`, dark text | 5.9:1 vs surface, text 6.9:1 |
 | good | `#5562DA`, white text | 3.1:1 vs surface, text 5.3:1 |
 | okay | `#7C8197`, dark text | 4.1:1 vs surface, text 4.8:1 |
