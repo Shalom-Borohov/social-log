@@ -1,10 +1,11 @@
-import { screen, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { db } from '../../src/data/db'
 import { freezeDate } from '../helpers/clock'
 import { resetDb } from '../helpers/db'
 import { findButton, slot, tap, tapSlot } from '../helpers/log'
 import { aMeetup, aPerson } from '../helpers/meetups'
+import { clickToastButton, toasts } from '../helpers/overlays'
 import { renderAt } from '../helpers/renderAt'
 
 const tamar = aPerson({ id: 'tamar', name: 'תמר' })
@@ -43,6 +44,28 @@ describe('איפה', () => {
     await openPlace()
 
     expect(await recentPlaces()).toEqual(['מקום ג', 'מקום ז', 'מקום ו', 'מקום ה', 'מקום ד', 'מקום ב'])
+  })
+
+  it('hides a recent place in עריכה, moving the next one up, and ביטול brings it back', async () => {
+    await db.meetups.bulkPut(
+      ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז'].map((letter, index) =>
+        aMeetup({ date: `2026-10-0${index + 1}`, place: `מקום ${letter}`, personIds: ['tamar'] }),
+      ),
+    )
+    await openPlace()
+
+    await tap('עריכה')
+    await tap('הסתרה: מקום ז')
+    await waitFor(() => expect(toasts()).toContain('המקום „מקום ז” הוסר מהמקומות האחרונים'))
+    await tap('סיום')
+
+    expect(await recentPlaces()).toEqual(['מקום ו', 'מקום ה', 'מקום ד', 'מקום ג', 'מקום ב', 'מקום א'])
+
+    clickToastButton('ביטול')
+
+    await waitFor(async () =>
+      expect(await recentPlaces()).toEqual(['מקום ז', 'מקום ו', 'מקום ה', 'מקום ד', 'מקום ג', 'מקום ב']),
+    )
   })
 
   it('fills the place from a recent one and moves on', async () => {

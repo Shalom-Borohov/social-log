@@ -10,7 +10,7 @@ describe('recentPlaces', () => {
       aMeetup({ date: '2026-11-02', place: 'בטיילת' }),
     ]
 
-    expect(recentPlaces(meetups)).toEqual(['אצל נועם', 'בטיילת'])
+    expect(recentPlaces(meetups, [])).toEqual(['אצל נועם', 'בטיילת'])
   })
 
   it('puts the later of two same-day meetups first', () => {
@@ -19,7 +19,7 @@ describe('recentPlaces', () => {
       aMeetup({ date: '2026-11-03', place: 'בים', createdAt: 2 }),
     ]
 
-    expect(recentPlaces(meetups)).toEqual(['בים', 'בקפה'])
+    expect(recentPlaces(meetups, [])).toEqual(['בים', 'בקפה'])
   })
 
   it('offers at most six', () => {
@@ -27,7 +27,15 @@ describe('recentPlaces', () => {
       aMeetup({ date: `2026-11-0${index + 1}`, place: `מקום ${index + 1}` }),
     )
 
-    expect(recentPlaces(meetups)).toEqual(['מקום 8', 'מקום 7', 'מקום 6', 'מקום 5', 'מקום 4', 'מקום 3'])
+    expect(recentPlaces(meetups, [])).toEqual(['מקום 8', 'מקום 7', 'מקום 6', 'מקום 5', 'מקום 4', 'מקום 3'])
+  })
+
+  it('leaves out hidden places and moves an older one up', () => {
+    const meetups = Array.from({ length: 8 }, (_, index) =>
+      aMeetup({ date: `2026-11-0${index + 1}`, place: `מקום ${index + 1}` }),
+    )
+
+    expect(recentPlaces(meetups, ['מקום 7'])).toEqual(['מקום 8', 'מקום 6', 'מקום 5', 'מקום 4', 'מקום 3', 'מקום 2'])
   })
 })
 

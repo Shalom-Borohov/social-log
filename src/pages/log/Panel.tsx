@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { LOG_COPY } from './copy'
 
 interface PanelProps {
   heading: string
@@ -19,13 +20,41 @@ export function Panel({ heading, children, action }: PanelProps) {
 interface ChipProps {
   label: string
   pressed: boolean
+  disabled?: boolean
   onClick: () => void
 }
 
-export function Chip({ label, pressed, onClick }: ChipProps) {
+export function Chip({ label, pressed, disabled = false, onClick }: ChipProps) {
   return (
-    <button type="button" className="log-chip" aria-pressed={pressed} onClick={onClick}>
+    <button type="button" className="log-chip" aria-pressed={pressed} disabled={disabled} onClick={onClick}>
       {label}
+    </button>
+  )
+}
+
+interface RemoveChipProps {
+  label: string
+  onRemove: () => void
+}
+
+export function RemoveChip({ label, onRemove }: RemoveChipProps) {
+  return (
+    <button type="button" className="log-chip log-chip-remove" aria-label={LOG_COPY.hideChip(label)} onClick={onRemove}>
+      {label}
+      <span aria-hidden="true">✕</span>
+    </button>
+  )
+}
+
+interface EditToggleProps {
+  editing: boolean
+  onToggle: () => void
+}
+
+export function EditToggle({ editing, onToggle }: EditToggleProps) {
+  return (
+    <button type="button" className="log-edit-toggle" onClick={onToggle}>
+      {editing ? LOG_COPY.doneEditing : LOG_COPY.edit}
     </button>
   )
 }
