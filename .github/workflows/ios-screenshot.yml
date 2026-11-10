@@ -1,0 +1,131 @@
+name: iOS Safari screenshot
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/ios-screenshot.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-screenshot-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  DEVICE: iPhone SE (2nd generation)
+  APP_URL: http://localhost:4173/social-log/
+
+jobs:
+  screenshot:
+    runs-on: xcode-27
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+      - name: Add a page that marks this version's מה חדש as seen
+        run: |
+          version=$(node -p "require('./package.json').version")
+          printf '<!doctype html><script>localStorage.setItem("social-log:seen-version", "%s"); location.replace("./")</script>\n' "$version" > dist/mark-seen.html
+
+      - name: Serve the build
+        run: |
+          npm run preview -- --port 4173 --strictPort > preview.log 2>&1 &
+          curl --silent --fail --retry 30 --retry-delay 1 --retry-all-errors --output /dev/null "$APP_URL" || { cat preview.log; exit 1; }
+
+      - name: Put the runner on Israel time before the simulator boots
+        run: sudo systemsetup -settimezone Asia/Jerusalem
+
+      - name: Create the device on the newest iOS runtime that supports it
+        run: |
+          selection=$(xcrun simctl list runtimes --json | jq -r --arg device "$DEVICE" '
+            [.runtimes[]
+              | select(.isAvailable and (.identifier | startswith("com.apple.CoreSimulator.SimRuntime.iOS-")))
+              | {runtime: .identifier, version, type: (.supportedDeviceTypes[] | select(.name == $device) | .identifier)}]
+            | sort_by(.version | split(".") | map(tonumber))
+            | last // empty
+            | "\(.runtime) \(.type) \(.version)"')
+
+          if [ -z "$selection" ]; then
+            echo "::error::No installed iOS runtime supports $DEVICE"
+            exit 1
+          fi
+
+          read -r runtime device_type version <<< "$selection"
+          udid=$(xcrun simctl create "$DEVICE" "$device_type" "$runtime")
+          xcrun simctl bootstatus "$udid" -b
+          echo "UDID=$udid" >> "$GITHUB_ENV"
+          echo "IOS_VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Switch the simulator to Hebrew
+        run: |
+          xcrun simctl spawn "$UDID" defaults write NSGlobalDomain AppleLanguages -array he
+          xcrun simctl spawn "$UDID" defaults write NSGlobalDomain AppleLocale -string he_IL
+          xcrun simctl shutdown "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          languages=$(xcrun simctl spawn "$UDID" defaults read NSGlobalDomain AppleLanguages)
+          locale=$(xcrun simctl spawn "$UDID" defaults read NSGlobalDomain AppleLocale)
+          echo "AppleLanguages: $languages"
+          echo "AppleLocale: $locale"
+
+          if ! grep -qw he <<< "$languages" || [ "$locale" != he_IL ]; then
+            echo "::error::The simulator did not keep Hebrew and the Israel region"
+            exit 1
+          fi
+
+      - name: Screenshot the app in Safari, light and dark
+        env:
+          PAGE_LOAD_SECONDS: 20
+          APPEARANCE_SWITCH_SECONDS: 3
+          OPEN_URL_ATTEMPTS: 3
+          OPEN_URL_RETRY_SECONDS: 10
+        run: |
+          xcrun simctl ui "$UDID" appearance light
+
+          for attempt in $(seq "$OPEN_URL_ATTEMPTS"); do
+            if xcrun simctl openurl "$UDID" "${APP_URL}mark-seen.html"; then
+              break
+            fi
+
+            if [ "$attempt" -eq "$OPEN_URL_ATTEMPTS" ]; then
+              echo "::error::Safari did not open the app after $OPEN_URL_ATTEMPTS attempts"
+              exit 1
+            fi
+
+            echo "::warning::Safari did not open the app on attempt $attempt, retrying"
+            sleep "$OPEN_URL_RETRY_SECONDS"
+          done
+
+          sleep "$PAGE_LOAD_SECONDS"
+          xcrun simctl io "$UDID" screenshot ios-safari-light.png
+          xcrun simctl ui "$UDID" appearance dark
+          sleep "$APPEARANCE_SWITCH_SECONDS"
+          xcrun simctl io "$UDID" screenshot ios-safari-dark.png
+
+      - name: Say what the screenshots show
+        run: |
+          echo "$DEVICE · iOS $IOS_VERSION · a Safari tab: compare with the same page in Safari on the phone, not the Home Screen app" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          path: ios-safari-light.png
+          archive: false
+          if-no-files-found: error
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          path: ios-safari-dark.png
+          archive: false
+          if-no-files-found: error

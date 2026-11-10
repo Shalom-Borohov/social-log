@@ -2,6 +2,11 @@
   --background: var(--ion-item-background);
   --border-color: var(--app-separator);
   --min-height: 44px;
+  --opacity-scale: 0;
+}
+
+.period-nav-solid ion-toolbar {
+  --opacity-scale: 1;
 }
 
 .period-nav ion-button {

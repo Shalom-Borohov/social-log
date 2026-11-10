@@ -76,10 +76,11 @@
     --rating-1-text: #0f1324;
   }
 
-  ion-modal {
+  :root.ios ion-modal {
     --ion-background-color: #1c2238;
     --ion-background-color-rgb: 28, 34, 56;
     --ion-item-background: #2a3152;
+    --ion-toolbar-background: var(--ion-background-color);
   }
 }
 
@@ -219,17 +220,6 @@ ion-note {
 
 .list-footer + .list-footer {
   margin-top: 0;
-}
-
-.inset-segment {
-  width: calc(100% - 32px);
-  margin: 16px 16px 0;
-}
-
-.inset-segment ion-segment-button {
-  min-height: 44px;
-  margin-block: 0;
-  font-size: 0.9375rem;
 }
 
 ion-buttons ion-button,

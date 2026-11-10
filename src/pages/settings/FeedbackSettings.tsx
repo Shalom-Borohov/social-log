@@ -21,6 +21,7 @@ import { useState } from 'react'
 import { COMMON_COPY } from '../../copy/common'
 import { SETTINGS_COPY } from './copy'
 import { type FeedbackKind, feedbackLink } from './feedbackUrl'
+import './feedback.css'
 
 const isKind = (kind: SegmentValue | undefined): kind is FeedbackKind => kind === 'bug' || kind === 'idea'
 
