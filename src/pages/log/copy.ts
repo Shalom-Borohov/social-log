@@ -59,6 +59,5 @@ export const LOG_COPY = {
   initiated: { me: 'אני יזמתי', them: 'הם יזמו' } satisfies Record<Initiator, string>,
   note: 'הערה',
   deleteHeader: 'למחוק את המפגש?',
-  deleteMessage: 'אי אפשר לבטל את המחיקה.',
   notFound: 'המפגש לא נמצא',
 } as const

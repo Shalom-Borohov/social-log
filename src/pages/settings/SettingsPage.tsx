@@ -27,8 +27,8 @@ import { useToast } from '../../hooks/useToast'
 import { CALENDAR_PATH } from '../../navigation/paths'
 import { SETTINGS_COPY } from './copy'
 import { FeedbackSettings } from './FeedbackSettings'
+import { FriendsSettings } from './FriendsSettings'
 import { GroupsSettings } from './GroupsSettings'
-import { HiddenPeopleSettings } from './HiddenPeopleSettings'
 import { VersionSettings } from './VersionSettings'
 
 export function SettingsPage() {
@@ -87,7 +87,7 @@ export function SettingsPage() {
         </IonNote>
         <IonNote className="list-footer">{SETTINGS_COPY.storageNote}</IonNote>
         <GroupsSettings />
-        <HiddenPeopleSettings />
+        <FriendsSettings />
         <FeedbackSettings />
         <VersionSettings />
         <input {...fileInputProps} />

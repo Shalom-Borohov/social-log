@@ -2,8 +2,13 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
-    version: '1.2.0',
+    version: '1.3.0',
     features: ['בלוח עוברים בין תקופות בהחלקה, בלי סרגל הקודם/הבא'],
+    fixes: [],
+  },
+  {
+    version: '1.2.0',
+    features: ['בהגדרות › חברים אפשר להסתיר ולהציג כל חבר, ולמחוק מי שלא מופיע באף מפגש או קבוצה'],
     fixes: [],
   },
   {

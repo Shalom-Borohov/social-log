@@ -12,6 +12,7 @@ import { useNewMeetupPath } from './pages/calendar/useTappedDay'
 import { AllFriendsPage } from './pages/friends/AllFriendsPage'
 import { FriendsPage } from './pages/friends/FriendsPage'
 import { PersonPage } from './pages/friends/PersonPage'
+import { FriendsSettingsPage } from './pages/settings/FriendsSettingsPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
 import './tabs.css'
 
@@ -32,6 +33,7 @@ export function Tabs() {
         <IonRouterOutlet>
           <Route path="calendar" element={<CalendarPage />} />
           <Route path="calendar/settings" element={<SettingsPage />} />
+          <Route path="calendar/settings/friends" element={<FriendsSettingsPage />} />
           <Route path="friends" element={<FriendsPage />} />
           <Route path="friends/all" element={<AllFriendsPage />} />
           <Route path="friends/person/:personId" element={<PersonPage />} />
