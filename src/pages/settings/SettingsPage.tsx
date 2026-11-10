@@ -27,8 +27,8 @@ import { useToast } from '../../hooks/useToast'
 import { CALENDAR_PATH } from '../../navigation/paths'
 import { SETTINGS_COPY } from './copy'
 import { FeedbackSettings } from './FeedbackSettings'
+import { FriendsSettings } from './FriendsSettings'
 import { GroupsSettings } from './GroupsSettings'
-import { HiddenPeopleSettings } from './HiddenPeopleSettings'
 import { SavedChoicesSettings } from './SavedChoicesSettings'
 import { VersionSettings } from './VersionSettings'
 
@@ -90,7 +90,8 @@ export function SettingsPage() {
         <GroupsSettings />
         <SavedChoicesSettings kind="place" />
         <SavedChoicesSettings kind="activity" />
-        <HiddenPeopleSettings />
+        <FriendsSettings />
+
         <FeedbackSettings />
         <VersionSettings />
         <input {...fileInputProps} />

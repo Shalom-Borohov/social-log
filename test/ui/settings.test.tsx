@@ -8,7 +8,7 @@ import { resetDb } from '../helpers/db'
 import { ionChange, ionField, ionInput } from '../helpers/ionic'
 import { aGroup, aMeetup, aPerson } from '../helpers/meetups'
 import { toasts } from '../helpers/overlays'
-import { renderAt } from '../helpers/renderAt'
+import { currentPath, renderAt } from '../helpers/renderAt'
 
 const SETTINGS = '/tabs/calendar/settings'
 
@@ -20,11 +20,13 @@ const army = aGroup({ id: 'army', memberIds: ['noam'] })
 
 const walk = aMeetup({ id: 'walk', personIds: ['noam'], activities: ['הליכה'], initiator: 'me' })
 
-function hiddenRow(name: string): HTMLElement {
-  const row = screen.getByText(name).closest('ion-item')
+const FRIENDS_ROW_LABEL = { selector: 'ion-item ion-label' }
+
+function friendsRow(): HTMLElement {
+  const row = screen.getByText('חברים', FRIENDS_ROW_LABEL).closest('ion-item')
 
   if (!(row instanceof HTMLElement)) {
-    throw new Error(`no row for ${name}`)
+    throw new Error('no friends row')
   }
 
   return row
@@ -165,34 +167,35 @@ describe('settings', () => {
   })
 })
 
-describe('hidden from Orbit', () => {
+describe('the friends row', () => {
   beforeEach(resetDb)
 
-  it('lists the hidden people and shows one again in Orbit', async () => {
+  it('shows how many friends there are, hidden ones included, without listing them', async () => {
     await db.people.bulkPut([
       noam,
       aPerson({ id: 'dana', name: 'דנה', hidden: true }),
-      aPerson({ id: 'itay', name: 'איתי', hidden: true }),
+      aPerson({ id: 'itay', name: 'איתי' }),
     ])
     renderAt(SETTINGS)
 
-    expect(await screen.findByText('מוסתרים מהמסלול')).toBeInTheDocument()
-    expect(screen.getByText('דנה')).toBeInTheDocument()
-    expect(screen.getByText('איתי')).toBeInTheDocument()
-    expect(screen.queryByText('נועם')).not.toBeInTheDocument()
-
-    fireEvent.click(within(hiddenRow('דנה')).getByText('הצגה'))
-
-    await waitFor(async () => expect((await db.people.get('dana'))?.hidden).toBe(false))
-    await waitFor(() => expect(screen.queryByText('דנה')).not.toBeInTheDocument())
-    expect(screen.getByText('איתי')).toBeInTheDocument()
+    await waitFor(() => expect(within(friendsRow()).getByText('3')).toBeInTheDocument())
+    expect(screen.queryByText('מוסתרים מהמסלול')).not.toBeInTheDocument()
+    expect(screen.queryByText('דנה')).not.toBeInTheDocument()
   })
 
-  it('is left out when nobody is hidden', async () => {
+  it('opens the friends page', async () => {
     await db.people.put(noam)
+    renderAt(SETTINGS)
+
+    await waitFor(() => fireEvent.click(friendsRow()))
+
+    await waitFor(() => expect(currentPath()).toBe('/tabs/calendar/settings/friends'))
+  })
+
+  it('is left out before anyone is added', async () => {
     renderAt(SETTINGS)
     await screen.findByText('ייבוא גיבוי')
 
-    expect(screen.queryByText('מוסתרים מהמסלול')).not.toBeInTheDocument()
+    expect(screen.queryByText('חברים', FRIENDS_ROW_LABEL)).not.toBeInTheDocument()
   })
 })

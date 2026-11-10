@@ -1,4 +1,5 @@
 import { COMMON_COPY } from '../copy/common'
+import { isUnused } from '../domain/person'
 import type { Group, Meetup, MeetupDraft, Person } from '../domain/types'
 import { db } from './db'
 
@@ -41,10 +42,9 @@ export async function forgetUnusedPeople(ids: string[]) {
     const groups = await db.groups.toArray()
 
     for (const id of ids) {
-      const inGroup = groups.some((group) => group.memberIds.includes(id))
-      const meetups = await db.meetups.where('personIds').equals(id).count()
+      const meetups = await db.meetups.where('personIds').equals(id).toArray()
 
-      if (!inGroup && meetups === 0) {
+      if (isUnused(id, meetups, groups)) {
         await db.people.delete(id)
       }
     }

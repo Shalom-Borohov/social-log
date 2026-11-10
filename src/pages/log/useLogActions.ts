@@ -69,7 +69,7 @@ export function useLogActions(meetupId: string | undefined) {
   const confirmDelete = (id: string) =>
     void presentAlert({
       header: LOG_COPY.deleteHeader,
-      message: LOG_COPY.deleteMessage,
+      message: COMMON_COPY.deleteCannotBeUndone,
       buttons: [
         { text: COMMON_COPY.cancel, role: 'cancel' },
         { text: COMMON_COPY.delete, role: 'destructive', handler: () => void removeMeetup(id) },

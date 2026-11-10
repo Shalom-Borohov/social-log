@@ -239,3 +239,12 @@ ion-buttons ion-back-button::after,
   height: max(100%, 44px);
   translate: -50% -50%;
 }
+
+.visually-hidden-focusable:not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

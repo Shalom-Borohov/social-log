@@ -1,8 +1,4 @@
-import { IonButton, IonButtons, IonFooter, IonIcon, IonToolbar } from '@ionic/react'
-import { chevronBack, chevronForward } from 'ionicons/icons'
-import type { RefObject } from 'react'
-import { COMMON_COPY } from '../copy/common'
-import { useContentBelow } from '../hooks/useContentBelow'
+import { IonButton } from '@ionic/react'
 import './PeriodNav.css'
 
 interface PeriodNavProps {
@@ -11,29 +7,17 @@ interface PeriodNavProps {
   onPrevious: () => void
   onNext: () => void
   nextDisabled: boolean
-  areaRef: RefObject<HTMLIonContentElement | null>
-  paneRef: RefObject<HTMLElement | null>
 }
 
-export function PeriodNav({ previousLabel, nextLabel, onPrevious, onNext, nextDisabled, areaRef, paneRef }: PeriodNavProps) {
-  const solid = useContentBelow(areaRef, paneRef)
-
+export function PeriodNav({ previousLabel, nextLabel, onPrevious, onNext, nextDisabled }: PeriodNavProps) {
   return (
-    <IonFooter className={solid ? 'period-nav period-nav-solid' : 'period-nav'}>
-      <IonToolbar>
-        <IonButtons slot="start">
-          <IonButton aria-label={previousLabel} onClick={onPrevious}>
-            <IonIcon slot="start" icon={chevronForward} aria-hidden="true" />
-            {COMMON_COPY.previous}
-          </IonButton>
-        </IonButtons>
-        <IonButtons slot="end">
-          <IonButton aria-label={nextLabel} disabled={nextDisabled} onClick={onNext}>
-            {COMMON_COPY.next}
-            <IonIcon slot="end" icon={chevronBack} aria-hidden="true" />
-          </IonButton>
-        </IonButtons>
-      </IonToolbar>
-    </IonFooter>
+    <div className="period-nav visually-hidden-focusable">
+      <IonButton fill="clear" aria-label={previousLabel} onClick={onPrevious}>
+        {previousLabel}
+      </IonButton>
+      <IonButton fill="clear" aria-label={nextLabel} disabled={nextDisabled} onClick={onNext}>
+        {nextLabel}
+      </IonButton>
+    </div>
   )
 }

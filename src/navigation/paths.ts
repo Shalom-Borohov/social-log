@@ -10,6 +10,8 @@ export const FRIENDS_PATH = tabPath('friends')
 
 export const SETTINGS_PATH = `${CALENDAR_PATH}/settings`
 
+export const SETTINGS_FRIENDS_PATH = `${SETTINGS_PATH}/friends`
+
 export const ALL_FRIENDS_PATH = `${FRIENDS_PATH}/all`
 
 export const personPath = (personId: string) => `${FRIENDS_PATH}/person/${personId}`
