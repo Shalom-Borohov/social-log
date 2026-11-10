@@ -12,7 +12,7 @@ One person, the owner: an Israeli Hebrew speaker who wants an honest record of t
 
 ## Product Purpose
 
-נפגשנו records each meetup with friends (who, when, where, how long and how it went) and turns the record into two answers: what the last weeks of social life looked like (the calendar), and who you are drifting away from (the friends orbit). Success is that logging takes seconds, and that the app quietly shows a friend you are overdue to see.
+מפגשים records each meetup with friends (who, when, where, how long and how it went) and turns the record into two answers: what the last weeks of social life looked like (the calendar), and who you are drifting away from (the friends orbit). Success is that logging takes seconds, and that the app quietly shows a friend you are overdue to see.
 
 ## Positioning
 
@@ -33,7 +33,7 @@ A private log that measures closeness by your own rhythm with each person: the n
 
 ## Brand Commitments
 
-- Name: נפגשנו (chosen by the owner). Repo and folder: `social-log`.
+- Name: מפגשים (chosen by the owner, replacing נפגשנו on 2026-11-10). Repo and folder: `social-log`.
 - Voice: quiet and factual, like the sibling app תפילות. Numbers and plain labels, no praise and no guilt; "לא ראית את תמר 4 חודשים" is stated, never scolded.
 - The chosen screens are on the design canvas https://claude.ai/artifact/Rj6WfdddijRwGoLbbhtWsh (page "Your combination", row "New colours", logging look A).
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-נפגשנו: a personal, offline-only iPhone PWA for logging meetups with friends (who, when, where, how long, how it was). Hebrew, RTL. There is no server or account: all data lives in IndexedDB on the device, and a JSON backup file can be exported and imported.
+מפגשים: a personal, offline-only iPhone PWA for logging meetups with friends (who, when, where, how long, how it was). Hebrew, RTL. There is no server or account: all data lives in IndexedDB on the device, and a JSON backup file can be exported and imported.
 
 ## Commands
 
