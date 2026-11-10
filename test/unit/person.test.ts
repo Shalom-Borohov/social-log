@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { personSummary } from '../../src/domain/person'
-import { aMeetup } from '../helpers/meetups'
+import { isUnused, personSummary } from '../../src/domain/person'
+import { aGroup, aMeetup } from '../helpers/meetups'
 
 describe('personSummary', () => {
   it('summarises meetups with one person, newest first', () => {
@@ -23,5 +23,17 @@ describe('personSummary', () => {
     const summary = personSummary('tamar', [])
 
     expect(summary).toEqual({ history: [], lastDate: null, usualGap: null, initiated: { me: 0, them: 0 } })
+  })
+})
+
+describe('isUnused', () => {
+  const meetups = [aMeetup({ personIds: ['tamar', 'noam'] })]
+
+  const groups = [aGroup({ memberIds: ['ori', 'dana'] })]
+
+  it('is true only for someone in no meetup and no group', () => {
+    expect(isUnused('typo', meetups, groups)).toBe(true)
+    expect(isUnused('noam', meetups, groups)).toBe(false)
+    expect(isUnused('dana', meetups, groups)).toBe(false)
   })
 })

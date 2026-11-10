@@ -1,4 +1,5 @@
 import { IonItem, IonLabel, IonList, IonNote, IonToggle } from '@ionic/react'
+import { COMMON_COPY } from '../../copy/common'
 import { setPersonHidden } from '../../data/repo'
 import { dayLabel } from '../../domain/format'
 import type { PersonSummary } from '../../domain/person'
@@ -43,7 +44,7 @@ export function PersonSummaryList({ person, summary }: PersonSummaryListProps) {
           checked={!person.hidden}
           onIonChange={(event) => void save(setPersonHidden(person.id, !event.detail.checked))}
         >
-          {FRIENDS_COPY.showInOrbit}
+          {COMMON_COPY.showInOrbit}
         </IonToggle>
       </IonItem>
     </IonList>

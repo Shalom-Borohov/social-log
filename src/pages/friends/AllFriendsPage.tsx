@@ -41,7 +41,7 @@ export function AllFriendsPage() {
               <IonItem key={person.id} button routerLink={personPath(person.id)}>
                 <IonLabel>
                   <h2>{person.name}</h2>
-                  {person.hidden && <p>{FRIENDS_COPY.hiddenFromOrbit}</p>}
+                  {person.hidden && <p>{COMMON_COPY.hiddenFromOrbit}</p>}
                 </IonLabel>
                 <IonNote slot="end">{daysSince === null ? FRIENDS_COPY.neverMet : agoLabel(daysSince)}</IonNote>
               </IonItem>

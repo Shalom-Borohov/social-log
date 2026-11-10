@@ -2,6 +2,11 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.2.0',
+    features: ['בהגדרות › חברים אפשר להסתיר ולהציג כל חבר, ולמחוק מי שלא מופיע באף מפגש או קבוצה'],
+    fixes: [],
+  },
+  {
     version: '1.1.1',
     features: [],
     fixes: [
