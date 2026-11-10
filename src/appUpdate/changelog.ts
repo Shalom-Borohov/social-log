@@ -2,6 +2,11 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.5.0',
+    features: ['כשאותם חברים חוזרים בכמה מפגשים, מוצע לשמור אותם כקבוצה'],
+    fixes: [],
+  },
+  {
     version: '1.4.0',
     features: [
       'מקום או פעילות חדשים נשמרים להצעות רק כשבוחרים „שמירה לפעם הבאה”',

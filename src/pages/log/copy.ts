@@ -42,6 +42,7 @@ export const LOG_COPY = {
   saveForNextTime: (name: string) => `שמירת „${name}” לפעם הבאה`,
   saveAsGroup: 'שמירה כקבוצה',
   groupName: 'שם הקבוצה',
+  togetherBefore: (count: number, names: string) => `כבר ${count} מפגשים עם ${names}`,
   place: 'מקום',
   placePlaceholder: 'בטיילת, אצל נועם…',
   savedPlaces: 'מקומות שמורים',
