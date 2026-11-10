@@ -1,7 +1,11 @@
-.period-nav ion-toolbar {
-  --background: var(--ion-item-background);
-  --border-color: var(--app-separator);
-  --min-height: 44px;
+.period-nav {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  min-height: 44px;
+  background: var(--app-surface);
+  border-top: 0.55px solid var(--app-separator);
 }
 
 .period-nav ion-button {

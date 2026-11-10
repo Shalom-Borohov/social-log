@@ -1,6 +1,8 @@
 import type { FormEvent } from 'react'
+import { hidePlace, showPlace } from '../../data/repo'
 import { LOG_COPY } from './copy'
-import { Chip, ChipGroup, MainAction, Panel } from './Panel'
+import { Chip, ChipGroup, EditToggle, MainAction, Panel, RemoveChip } from './Panel'
+import { useChipEditing } from './useChipEditing'
 
 interface PlacePanelProps {
   place: string
@@ -12,6 +14,7 @@ interface PlacePanelProps {
 
 export function PlacePanel({ place, recentPlaces, onChange, onPick, onNext }: PlacePanelProps) {
   const empty = place.trim() === ''
+  const { editing, toggleEditing, hideWithUndo } = useChipEditing()
 
   function submit(event: FormEvent) {
     event.preventDefault()
@@ -20,6 +23,13 @@ export function PlacePanel({ place, recentPlaces, onChange, onPick, onNext }: Pl
       onNext()
     }
   }
+
+  const hide = (recent: string) =>
+    hideWithUndo(
+      () => hidePlace(recent),
+      () => showPlace(recent),
+      LOG_COPY.placeHidden(recent),
+    )
 
   return (
     <Panel
@@ -36,11 +46,18 @@ export function PlacePanel({ place, recentPlaces, onChange, onPick, onNext }: Pl
         />
       </form>
       {recentPlaces.length > 0 && (
-        <ChipGroup label={LOG_COPY.recentPlaces}>
-          {recentPlaces.map((recent) => (
-            <Chip key={recent} label={recent} pressed={recent === place.trim()} onClick={() => onPick(recent)} />
-          ))}
-        </ChipGroup>
+        <>
+          <EditToggle editing={editing} onToggle={toggleEditing} />
+          <ChipGroup label={LOG_COPY.recentPlaces}>
+            {recentPlaces.map((recent) =>
+              editing ? (
+                <RemoveChip key={recent} label={recent} onRemove={() => void hide(recent)} />
+              ) : (
+                <Chip key={recent} label={recent} pressed={recent === place.trim()} onClick={() => onPick(recent)} />
+              ),
+            )}
+          </ChipGroup>
+        </>
       )}
     </Panel>
   )

@@ -1,8 +1,10 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { db } from '../../src/data/db'
+import { dayButton, openCalendar } from '../helpers/calendar'
 import { freezeDate } from '../helpers/clock'
 import { resetDb } from '../helpers/db'
+import { ionElement } from '../helpers/ionic'
 import { findButton, slot, tap, tapSlot } from '../helpers/log'
 import { aMeetup, aPerson } from '../helpers/meetups'
 import { alertDismissed, alertHeader, alertShown, clickAlertButton } from '../helpers/overlays'
@@ -72,6 +74,27 @@ describe('editing a meetup', () => {
     await waitFor(() => expect(currentPath()).toBe('/tabs/calendar'))
     expect(await db.meetups.count()).toBe(0)
     expect(screen.queryByText('המפגש לא נמצא')).not.toBeInTheDocument()
+  })
+
+  it('never says the meetup is missing while leaving after a delete from the calendar', async () => {
+    let notFoundShown = false
+
+    const watcher = new MutationObserver(() => {
+      notFoundShown ||= document.body.textContent?.includes('המפגש לא נמצא') ?? false
+    })
+
+    watcher.observe(document.body, { subtree: true, childList: true, characterData: true })
+    await openCalendar()
+    fireEvent.click(await dayButton('יום חמישי 5.11'))
+    fireEvent.click(await ionElement('.calendar-meetups ion-item'))
+    await waitFor(() => expect(currentPath()).toBe('/log/walk'))
+    await askToDelete()
+    clickAlertButton('מחיקה')
+    await waitFor(() => expect(currentPath()).toBe('/tabs/calendar'))
+    await waitFor(() => expect(document.querySelector('.log-screen')).toBeNull())
+    watcher.disconnect()
+
+    expect(notFoundShown).toBe(false)
   })
 
   it('keeps the meetup when the delete is cancelled', async () => {

@@ -113,3 +113,29 @@
   font-weight: 700;
   text-align: center;
 }
+
+.log-edit-toggle {
+  align-self: flex-end;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--app-ink);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.log-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: inset 0 0 0 1.5px var(--app-outline);
+}
+
+.log-chip-remove span {
+  font-size: 15px;
+  font-weight: 700;
+}

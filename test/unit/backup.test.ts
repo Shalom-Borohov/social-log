@@ -1,6 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { countBadRecords, exportBackup, InvalidBackupError, parseBackup, restoreBackup } from '../../src/data/backup'
-import { addMeetup, addPerson, allGroups, allMeetups, allPeople, saveGroup } from '../../src/data/repo'
+import {
+  addMeetup,
+  addPerson,
+  allGroups,
+  allHiddenPlaces,
+  allMeetups,
+  allPeople,
+  hidePlace,
+  saveGroup,
+} from '../../src/data/repo'
 import { resetDb } from '../helpers/db'
 
 const exportedAt = Date.UTC(2026, 10, 8, 20)
@@ -38,6 +47,26 @@ describe('backup', () => {
 
     expect(backup).toMatchObject({ version: 1, exportedAt })
     expect({ people: await allPeople(), groups: await allGroups(), meetups: await allMeetups() }).toStrictEqual(before)
+  })
+
+  it('round-trips hidden places', async () => {
+    await hidePlace('בטיילת')
+
+    const backup = parseBackup(JSON.stringify(await exportBackup(exportedAt)))
+
+    await resetDb()
+    await hidePlace('בבית')
+    await restoreBackup(backup)
+
+    expect(await allHiddenPlaces()).toEqual(['בטיילת'])
+  })
+
+  it('restores an older backup without hidden places as none hidden', async () => {
+    await hidePlace('בבית')
+
+    await restoreBackup(parseBackup(JSON.stringify({ version: 1, exportedAt, people: [], groups: [], meetups: [] })))
+
+    expect(await allHiddenPlaces()).toEqual([])
   })
 
   it('accepts a meetup without the optional fields', () => {

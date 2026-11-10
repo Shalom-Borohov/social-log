@@ -56,3 +56,15 @@ export const typeInAlert = (value: string) => fireEvent.input(last('ion-alert in
 export const clickAlertButton = (text: string) => fireEvent.click(buttonIn('ion-alert', '.alert-button', text))
 
 export const toasts = () => Array.from(document.querySelectorAll('ion-toast'), (toast) => toast.message)
+
+export function clickToastButton(text: string) {
+  const match = Array.from(last('ion-toast').shadowRoot?.querySelectorAll('button') ?? []).find(
+    (button) => button.textContent?.trim() === text,
+  )
+
+  if (!match) {
+    throw new Error(`no toast button ${text}`)
+  }
+
+  fireEvent.click(match)
+}

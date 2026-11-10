@@ -1,3 +1,4 @@
+import { isLoggableDate } from '../../domain/logicalDay'
 import type { Initiator, Meetup, MeetupDraft, Rating } from '../../domain/types'
 
 export const SLOTS = ['date', 'people', 'place', 'duration', 'rating'] as const
@@ -23,9 +24,12 @@ export interface DraftFields {
 export const toggledIn = (items: string[], item: string) =>
   items.includes(item) ? items.filter((existing) => existing !== item) : [...items, item]
 
-export function emptyDraft(today: string): DraftFields {
-  return { date: today, personIds: [], place: '', activities: [], note: '' }
+export function emptyDraft(date: string): DraftFields {
+  return { date, personIds: [], place: '', activities: [], note: '' }
 }
+
+export const newMeetupDate = (requested: string | null, today: string) =>
+  requested !== null && isLoggableDate(requested, today) ? requested : today
 
 export function draftFromMeetup({ id: _id, createdAt: _createdAt, activities, note, ...fields }: Meetup): DraftFields {
   return { ...fields, activities: activities ?? [], note: note ?? '' }

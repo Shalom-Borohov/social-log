@@ -1,4 +1,5 @@
 import { COMMON_COPY } from '../copy/common'
+import { isUnused } from '../domain/person'
 import type { Group, Meetup, MeetupDraft, Person } from '../domain/types'
 import { db } from './db'
 
@@ -41,10 +42,9 @@ export async function forgetUnusedPeople(ids: string[]) {
     const groups = await db.groups.toArray()
 
     for (const id of ids) {
-      const inGroup = groups.some((group) => group.memberIds.includes(id))
-      const meetups = await db.meetups.where('personIds').equals(id).count()
+      const meetups = await db.meetups.where('personIds').equals(id).toArray()
 
-      if (!inGroup && meetups === 0) {
+      if (isUnused(id, meetups, groups)) {
         await db.people.delete(id)
       }
     }
@@ -102,19 +102,36 @@ export async function saveGroup(name: string, memberIds: string[]): Promise<Grou
 export async function addMeetup(draft: MeetupDraft): Promise<string> {
   const meetup: Meetup = { ...cleanDraft(draft), id: newId(), createdAt: Date.now() }
 
-  await db.meetups.add(meetup)
+  await db.transaction('rw', db.meetups, db.hiddenPlaces, async () => {
+    await db.meetups.add(meetup)
+    await showPlace(meetup.place)
+  })
 
   return meetup.id
 }
 
 export async function updateMeetup(id: string, draft: MeetupDraft) {
-  await db.transaction('rw', db.meetups, async () => {
+  await db.transaction('rw', db.meetups, db.hiddenPlaces, async () => {
     const existing = await db.meetups.get(id)
 
     if (existing) {
-      await db.meetups.put({ ...cleanDraft(draft), id, createdAt: existing.createdAt })
+      const cleaned = cleanDraft(draft)
+
+      await db.meetups.put({ ...cleaned, id, createdAt: existing.createdAt })
+
+      if (cleaned.place !== existing.place) {
+        await showPlace(cleaned.place)
+      }
     }
   })
+}
+
+export async function hidePlace(place: string) {
+  await db.hiddenPlaces.put({ place })
+}
+
+export async function showPlace(place: string) {
+  await db.hiddenPlaces.delete(place)
 }
 
 export async function deleteMeetup(id: string) {
@@ -126,3 +143,5 @@ export const allPeople = () => db.people.orderBy('name').toArray()
 export const allGroups = () => db.groups.toArray()
 
 export const allMeetups = () => db.meetups.orderBy('date').toArray()
+
+export const allHiddenPlaces = () => db.hiddenPlaces.toCollection().primaryKeys()

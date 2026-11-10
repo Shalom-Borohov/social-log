@@ -40,6 +40,11 @@ export const LOG_COPY = {
   place: 'מקום',
   placePlaceholder: 'בטיילת, אצל נועם…',
   recentPlaces: 'מקומות אחרונים',
+  edit: 'עריכה',
+  doneEditing: 'סיום',
+  hideChip: (label: string) => `הסתרה: ${label}`,
+  personHidden: (name: string) => `הסתרת את ${name} מהרשימה ומהמסלול`,
+  placeHidden: (place: string) => `המקום „${place}” הוסר מהמקומות האחרונים`,
   otherDuration: 'אחר',
   hoursLabel: 'שעות',
   minutesLabel: 'דקות',
@@ -54,6 +59,5 @@ export const LOG_COPY = {
   initiated: { me: 'אני יזמתי', them: 'הם יזמו' } satisfies Record<Initiator, string>,
   note: 'הערה',
   deleteHeader: 'למחוק את המפגש?',
-  deleteMessage: 'אי אפשר לבטל את המחיקה.',
   notFound: 'המפגש לא נמצא',
 } as const

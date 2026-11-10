@@ -76,10 +76,11 @@
     --rating-1-text: #0f1324;
   }
 
-  ion-modal {
+  :root.ios ion-modal {
     --ion-background-color: #1c2238;
     --ion-background-color-rgb: 28, 34, 56;
     --ion-item-background: #2a3152;
+    --ion-toolbar-background: var(--ion-background-color);
   }
 }
 
@@ -221,17 +222,6 @@ ion-note {
   margin-top: 0;
 }
 
-.inset-segment {
-  width: calc(100% - 32px);
-  margin: 16px 16px 0;
-}
-
-.inset-segment ion-segment-button {
-  min-height: 44px;
-  margin-block: 0;
-  font-size: 0.9375rem;
-}
-
 ion-buttons ion-button,
 ion-buttons ion-back-button,
 .update-bar ion-button {
@@ -248,4 +238,13 @@ ion-buttons ion-back-button::after,
   width: max(100%, 44px);
   height: max(100%, 44px);
   translate: -50% -50%;
+}
+
+.visually-hidden-focusable:not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
