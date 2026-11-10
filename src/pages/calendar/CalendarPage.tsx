@@ -66,8 +66,6 @@ export function CalendarPage() {
       <PeriodNav
         previousLabel={CALENDAR_COPY.previousWeeks(WEEKS_SHOWN)}
         nextLabel={CALENDAR_COPY.nextWeeks(WEEKS_SHOWN)}
-        areaRef={areaRef}
-        paneRef={paneRef}
         {...period}
       />
     </IonPage>

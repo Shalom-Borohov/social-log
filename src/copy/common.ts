@@ -22,6 +22,4 @@ export const COMMON_COPY = {
     count === 1 ? 'בגיבוי יש רשומה פגומה אחת, וייבוא הקובץ ייכשל' : `בגיבוי יש ${count} רשומות פגומות, וייבוא הקובץ ייכשל`,
   noBackupYet: 'עדיין לא נעשה גיבוי',
   backupDaysAgo: (days: number) => `הגיבוי האחרון לפני ${days} ימים`,
-  previous: 'הקודם',
-  next: 'הבא',
 } as const
