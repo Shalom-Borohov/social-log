@@ -58,7 +58,7 @@ export function GroupsSettings() {
         {groups.map((group) => (
           <IonItem key={group.id} button detail={false} onClick={() => openActions(group)}>
             <IonLabel>{group.name}</IonLabel>
-            <IonNote slot="end">{SETTINGS_COPY.groupSize(group.memberIds.length)}</IonNote>
+            <IonNote slot="end">{SETTINGS_COPY.peopleCount(group.memberIds.length)}</IonNote>
           </IonItem>
         ))}
       </IonList>

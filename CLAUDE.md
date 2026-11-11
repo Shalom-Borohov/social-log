@@ -32,7 +32,7 @@ Imports go downward only: `pages` → `data` / `domain` → `copy`. `Tabs`, `pag
 
 - **`src/domain/`**: pure functions over people, groups and meetups, with no React and no Dexie. Types live in `types.ts`.
 - **`src/domain/logicalDay.ts`**: dates are `'YYYY-MM-DD'` strings everywhere; convert only through `parseIsoDate` / `toIsoDate` (noon-pinned). A day rolls over at 03:00.
-- **`src/data/`**: the Dexie database `social-log` with tables `people`, `groups`, `meetups`, `savedPlaces` and `savedActivities` (a new phone gets the activity presets through `populate`). Every write goes through `repo.ts`. Pages read through the hooks in `hooks.ts` (`useLiveQuery`) and derive everything else in render.
+- **`src/data/`**: the Dexie database `social-log` with tables `people`, `groups`, `meetups`, `savedPlaces`, `savedActivities` and `circles` (a new phone gets the activity presets through `populate`). Every write goes through `repo.ts`, `savedChoices.ts` or `circles.ts`. Pages read through the hooks in `hooks.ts` (`useLiveQuery`) and derive everything else in render.
 - **`src/data/backup.ts`**: the valibot schema for the backup file. It stays `version: 1`; new fields must be optional.
 - **`src/pages/<feature>/`**: calendar, friends, log, settings. Each has its own `copy.ts` and CSS.
 - **`src/copy/`** and each page's `copy.ts`: every user-visible string is an `as const` copy constant. Don't inline Hebrew text in components.

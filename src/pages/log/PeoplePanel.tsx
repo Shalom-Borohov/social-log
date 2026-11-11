@@ -1,14 +1,17 @@
 import { useId, useState } from 'react'
+import { joinCircle } from '../../data/circles'
 import { addPerson, setPersonHidden } from '../../data/repo'
+import { chipPeople } from '../../domain/circles'
 import { GROUP_MINIMUM, groupSuggestion } from '../../domain/groupSuggestion'
 import { peopleLabel, sameMembers } from '../../domain/sentence'
-import type { Group, Meetup, Person } from '../../domain/types'
+import type { Circle, Group, Meetup, Person } from '../../domain/types'
 import { useRemoveWithUndo } from '../../hooks/useRemoveWithUndo'
 import { useSave } from '../../hooks/useSave'
 import { LOG_COPY } from './copy'
 import { type DraftFields, toggledIn } from './meetupDraft'
 import { AddField } from './AddField'
-import { Chip, ChipGroup, EditToggle, MainAction, Panel, RemoveChip } from './Panel'
+import { CircleFilter } from './CircleFilter'
+import { Chip, ChipGroup, EditToggle, LabelledChipGroup, MainAction, Panel, RemoveChip } from './Panel'
 import { useChipEditing } from './useChipEditing'
 import { useGroupPrompt } from './useGroupPrompt'
 import { useSplitPrompt } from './useSplitPrompt'
@@ -30,15 +33,28 @@ interface PeoplePanelProps {
   meetupId?: string
   people: Person[]
   groups: Group[]
+  circles: Circle[]
   meetups: Meetup[]
   onChange: (choice: Partial<PeopleChoice>) => void
   onNewPerson: (personId: string) => void
   onNext: () => void
 }
 
-export function PeoplePanel({ choice, meetupId, people, groups, meetups, onChange, onNewPerson, onNext }: PeoplePanelProps) {
+export function PeoplePanel({
+  choice,
+  meetupId,
+  people,
+  groups,
+  circles,
+  meetups,
+  onChange,
+  onNewPerson,
+  onNext,
+}: PeoplePanelProps) {
   const { personIds, groupId } = choice
   const [newName, setNewName] = useState('')
+  const [circleId, setCircleId] = useState<string>()
+  const circle = circles.find(({ id }) => id === circleId)
   const hintId = useId()
   const together = groupSuggestion(personIds, meetups, groups, meetupId)
   const suggestGroup = together > 0
@@ -47,7 +63,7 @@ export function PeoplePanel({ choice, meetupId, people, groups, meetups, onChang
   const askSplit = useSplitPrompt()
   const { editing, toggleEditing } = useChipEditing()
   const hideWithUndo = useRemoveWithUndo()
-  const shownPeople = people.filter((person) => !person.hidden || personIds.includes(person.id))
+  const shownPeople = chipPeople(people, personIds, circle)
   const anyUnpicked = shownPeople.some((person) => !personIds.includes(person.id))
 
   const hide = (person: Person) =>
@@ -59,7 +75,11 @@ export function PeoplePanel({ choice, meetupId, people, groups, meetups, onChang
 
   async function addPeople(names: string[]) {
     const added = await save(
-      addInOrder(names).then((addedIds) => {
+      addInOrder(names).then(async (addedIds) => {
+        if (circle) {
+          await joinCircle(circle.id, addedIds)
+        }
+
         for (const id of addedIds) {
           if (!people.some((person) => person.id === id)) {
             onNewPerson(id)
@@ -89,7 +109,7 @@ export function PeoplePanel({ choice, meetupId, people, groups, meetups, onChang
       action={<MainAction label={LOG_COPY.next} disabled={personIds.length === 0} onClick={onNext} />}
     >
       {groups.length > 0 && (
-        <ChipGroup label={LOG_COPY.groups}>
+        <LabelledChipGroup label={LOG_COPY.groups}>
           {groups.map((group) => (
             <Chip
               key={group.id}
@@ -99,8 +119,9 @@ export function PeoplePanel({ choice, meetupId, people, groups, meetups, onChang
               onClick={() => onChange({ personIds: group.memberIds, groupId: group.id })}
             />
           ))}
-        </ChipGroup>
+        </LabelledChipGroup>
       )}
+      <CircleFilter circles={circles} selectedId={circle?.id} onSelect={setCircleId} />
       {(anyUnpicked || editing) && <EditToggle editing={editing} onToggle={toggleEditing} />}
       <ChipGroup label={LOG_COPY.people}>
         {shownPeople.map((person) => {

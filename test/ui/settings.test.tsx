@@ -20,6 +20,8 @@ const army = aGroup({ id: 'army', memberIds: ['noam'] })
 
 const walk = aMeetup({ id: 'walk', personIds: ['noam'], activities: ['הליכה'], initiator: 'me' })
 
+const friendsFromWork = { id: 'work', name: 'עבודה', memberIds: ['noam'] }
+
 const FRIENDS_ROW_LABEL = { selector: 'ion-item ion-label' }
 
 function friendsRow(): HTMLElement {
@@ -60,11 +62,12 @@ describe('settings', () => {
     vi.restoreAllMocks()
   })
 
-  it('exports a backup with people, groups, meetups and the saved places and activities through the share sheet', async () => {
+  it('exports a backup with people, groups, meetups, saved places and activities and circles through the share sheet', async () => {
     await storeSample()
     await db.savedActivities.clear()
     await saveChoices('place', ['בים'])
     await saveChoices('activity', ['טיול'])
+    await db.circles.add(friendsFromWork)
 
     const share = vi.fn<(data: ShareData) => Promise<void>>().mockResolvedValue()
 
@@ -86,6 +89,7 @@ describe('settings', () => {
       meetups: [walk],
       savedPlaces: [{ name: 'בים', savedAt: NOW }],
       savedActivities: [{ name: 'טיול', savedAt: NOW }],
+      circles: [friendsFromWork],
     })
   })
 

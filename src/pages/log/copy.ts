@@ -33,6 +33,8 @@ export const LOG_COPY = {
   otherDate: 'תאריך אחר',
   groups: 'קבוצות',
   people: 'חברים',
+  circle: 'מעגל',
+  everyone: 'כולם',
   newName: 'שם חדש',
   add: 'הוספה',
   splitAddHeader: 'להוסיף בנפרד?',

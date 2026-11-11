@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { type ReactNode, useId } from 'react'
 import { LOG_COPY } from './copy'
 
 interface PanelProps {
@@ -82,6 +82,19 @@ export function ChipGroup({ label, children }: ChipGroupProps) {
   return (
     <div className="log-chip-group" role="group" aria-label={label}>
       {children}
+    </div>
+  )
+}
+
+export function LabelledChipGroup({ label, children }: ChipGroupProps) {
+  const labelId = useId()
+
+  return (
+    <div className="log-labelled-chips" role="group" aria-labelledby={labelId}>
+      <p id={labelId} className="log-chip-group-label">
+        {label}
+      </p>
+      <div className="log-chip-group">{children}</div>
     </div>
   )
 }

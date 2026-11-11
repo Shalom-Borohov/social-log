@@ -12,6 +12,8 @@ import { useNewMeetupPath } from './pages/calendar/useTappedDay'
 import { AllFriendsPage } from './pages/friends/AllFriendsPage'
 import { FriendsPage } from './pages/friends/FriendsPage'
 import { PersonPage } from './pages/friends/PersonPage'
+import { CircleSettingsPage } from './pages/settings/CircleSettingsPage'
+import { CirclesSettingsPage } from './pages/settings/CirclesSettingsPage'
 import { FriendsSettingsPage } from './pages/settings/FriendsSettingsPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
 import './tabs.css'
@@ -34,6 +36,8 @@ export function Tabs() {
           <Route path="calendar" element={<CalendarPage />} />
           <Route path="calendar/settings" element={<SettingsPage />} />
           <Route path="calendar/settings/friends" element={<FriendsSettingsPage />} />
+          <Route path="calendar/settings/circles" element={<CirclesSettingsPage />} />
+          <Route path="calendar/settings/circles/:circleId" element={<CircleSettingsPage />} />
           <Route path="friends" element={<FriendsPage />} />
           <Route path="friends/all" element={<AllFriendsPage />} />
           <Route path="friends/person/:personId" element={<PersonPage />} />

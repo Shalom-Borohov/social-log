@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { inSavedOrder, placesByLastUse } from '../../domain/choices'
-import type { Group, Meetup, Person, SavedChoice } from '../../domain/types'
+import type { Circle, Group, Meetup, Person, SavedChoice } from '../../domain/types'
 import { DatePanel } from './DatePanel'
 import { DurationPanel } from './DurationPanel'
 import { ExtrasPanel } from './ExtrasPanel'
@@ -18,6 +18,7 @@ interface MeetupFormProps {
   today: string
   people: Person[]
   groups: Group[]
+  circles: Circle[]
   meetups: Meetup[]
   savedPlaces: SavedChoice[]
   savedActivities: SavedChoice[]
@@ -30,6 +31,7 @@ export function MeetupForm({
   today,
   people,
   groups,
+  circles,
   meetups,
   savedPlaces,
   savedActivities,
@@ -54,6 +56,7 @@ export function MeetupForm({
         meetupId={meetupId}
         people={people}
         groups={groups}
+        circles={circles}
         meetups={meetups}
         onChange={update}
         onNewPerson={actions.rememberNewPerson}
