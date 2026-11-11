@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { countBadRecords, exportBackup, InvalidBackupError, parseBackup, restoreBackup } from '../../src/data/backup'
 import { addMeetup, addPerson, allGroups, allMeetups, allPeople, saveGroup } from '../../src/data/repo'
+import { allCircles, joinCircle, saveCircle } from '../../src/data/circles'
 import { allSavedChoices, saveChoices } from '../../src/data/savedChoices'
 import { inSavedOrder } from '../../src/domain/choices'
 import { resetDb } from '../helpers/db'
@@ -41,6 +42,29 @@ describe('backup', () => {
 
     expect(backup).toMatchObject({ version: 1, exportedAt })
     expect({ people: await allPeople(), groups: await allGroups(), meetups: await allMeetups() }).toStrictEqual(before)
+  })
+
+  it('round-trips circles', async () => {
+    const tamar = await addPerson('תמר')
+    const { id } = await saveCircle('עבודה')
+
+    await joinCircle(id, [tamar.id])
+    const before = await allCircles()
+
+    const backup = parseBackup(JSON.stringify(await exportBackup(exportedAt)))
+
+    await resetDb()
+    await saveCircle('צבא')
+    await restoreBackup(backup)
+
+    expect(await allCircles()).toStrictEqual(before)
+  })
+
+  it('imports a file without circles as having none', async () => {
+    await saveCircle('צבא')
+    await restoreBackup(parseBackup(JSON.stringify({ version: 1, exportedAt, people: [], groups: [], meetups: [] })))
+
+    expect(await allCircles()).toEqual([])
   })
 
   it('round-trips the saved places and activities in their order', async () => {
@@ -123,8 +147,9 @@ describe('backup', () => {
       meetups: [],
       savedPlaces: [{ name: '', savedAt: 1 }],
       savedActivities: [{ name: 'קפה' }],
+      circles: [{ id: 'c', name: 'עבודה' }],
     }
 
-    expect(countBadRecords(JSON.stringify(file))).toBe(2)
+    expect(countBadRecords(JSON.stringify(file))).toBe(3)
   })
 })

@@ -7,7 +7,7 @@ export const SETTINGS_COPY = {
   storageNote:
     'הנתונים נשמרים רק במכשיר הזה. הייצוא יוצר קובץ עם כל המפגשים והחברים, שאפשר לשמור בקבצים ולשחזר ממנו בייבוא.',
   groups: 'קבוצות',
-  groupSize: (count: number) => `${count} אנשים`,
+  peopleCount: (count: number) => (count === 1 ? 'אדם אחד' : `${count} אנשים`),
   deleteGroupHeader: 'למחוק את הקבוצה?',
   deleteGroupMessage: 'המפגשים שלה יישארו, עם שמות האנשים.',
   savedChoices: {
@@ -17,6 +17,11 @@ export const SETTINGS_COPY = {
   hideFromOrbit: 'הסתרה מהמסלול',
   deletePersonHeader: (name: string) => `למחוק את ${name}?`,
   deleteRule: 'אפשר למחוק רק מי שלא מופיע באף מפגש או קבוצה.',
+  circles: 'מעגלים',
+  newCircle: 'מעגל חדש',
+  deleteCircleHeader: (name: string) => `למחוק את המעגל ${name}?`,
+  deleteCircleMessage: 'האנשים שבו לא יימחקו.',
+  circlesExplained: 'מעגל מקבץ אנשים מאותו עולם, כמו עבודה או צבא. בשלב מי בוחרים מעגל ורואים רק את האנשים שבו.',
   reportBugOrIdea: 'דיווח על באג / הצעה',
   report: 'דיווח',
   bug: 'באג',

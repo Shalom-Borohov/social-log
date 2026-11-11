@@ -21,6 +21,12 @@ export interface Group {
   memberIds: string[]
 }
 
+export interface Circle {
+  id: string
+  name: string
+  memberIds: string[]
+}
+
 export interface Meetup {
   id: string
   date: string

@@ -225,6 +225,19 @@
   color: var(--app-ink);
 }
 
+.log-labelled-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.log-chip-group-label {
+  margin: 0;
+  color: var(--app-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .log-group-hint {
   align-self: flex-start;
   margin: 0;

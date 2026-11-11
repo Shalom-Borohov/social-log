@@ -1,6 +1,6 @@
 import Dexie, { type EntityTable, type Transaction } from 'dexie'
 import { initialSavedLists } from '../domain/choices'
-import type { Group, HiddenPlace, Meetup, Person, SavedChoice } from '../domain/types'
+import type { Circle, Group, HiddenPlace, Meetup, Person, SavedChoice } from '../domain/types'
 
 const DB_NAME = 'social-log'
 
@@ -24,6 +24,7 @@ class SocialDb extends Dexie {
   meetups!: EntityTable<Meetup, 'id'>
   savedPlaces!: EntityTable<SavedChoice, 'name'>
   savedActivities!: EntityTable<SavedChoice, 'name'>
+  circles!: EntityTable<Circle, 'id'>
 
   constructor() {
     super(DB_NAME)
@@ -35,6 +36,7 @@ class SocialDb extends Dexie {
     this.version(2).stores({ hiddenPlaces: 'place' })
     this.version(3).stores({ savedPlaces: 'name', savedActivities: 'name' }).upgrade(saveTheChipsShownSoFar)
     this.version(4).stores({ hiddenPlaces: null })
+    this.version(5).stores({ circles: 'id' })
     this.on('populate', (tx) => void addSavedLists(tx, initialSavedLists([], [])))
   }
 }

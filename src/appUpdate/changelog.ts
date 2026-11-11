@@ -2,6 +2,11 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.6.0',
+    features: ['מעגלים: בהגדרות מקבצים חברים מאותו עולם, ובשלב מי בוחרים מעגל ורואים רק את האנשים שבו'],
+    fixes: [],
+  },
+  {
     version: '1.5.0',
     features: ['כשאותם חברים חוזרים בכמה מפגשים, מוצע לשמור אותם כקבוצה'],
     fixes: [],

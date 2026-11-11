@@ -19,7 +19,7 @@ import {
 import { APP_COPY } from '../copy/app'
 import { initialSavedLists } from '../domain/choices'
 import { isIsoDate, logicalToday, MINUTES_PER_HOUR } from '../domain/logicalDay'
-import { type Group, INITIATORS, type Meetup, type Person, RATINGS, type SavedChoice } from '../domain/types'
+import { type Circle, type Group, INITIATORS, type Meetup, type Person, RATINGS, type SavedChoice } from '../domain/types'
 import { db } from './db'
 
 export type Backup = {
@@ -31,6 +31,7 @@ export type Backup = {
   hiddenPlaces?: string[]
   savedPlaces?: SavedChoice[]
   savedActivities?: SavedChoice[]
+  circles?: Circle[]
 }
 
 const isNotInTheFuture = (date: string) => date <= logicalToday(Date.now())
@@ -48,6 +49,8 @@ export class InvalidBackupError extends Error {
 const personSchema = object({ id: string(), name: string(), hidden: boolean(), createdAt: number() })
 
 const groupSchema = object({ id: string(), name: string(), memberIds: array(string()) })
+
+const circleSchema = object({ id: string(), name: string(), memberIds: array(string()) })
 
 const meetupSchema = object({
   id: string(),
@@ -81,6 +84,7 @@ const backupSchema = pipe(
     hiddenPlaces: optional(array(string())),
     savedPlaces: optional(array(savedChoiceSchema)),
     savedActivities: optional(array(savedChoiceSchema)),
+    circles: optional(array(circleSchema)),
   }),
   check(everyoneIsKnown),
 )
@@ -104,51 +108,49 @@ export function parseBackup(text: string): Backup {
 }
 
 export async function exportBackup(now: number): Promise<Backup> {
-  const [people, groups, meetups, savedPlaces, savedActivities] = await Promise.all([
+  const [people, groups, meetups, savedPlaces, savedActivities, circles] = await Promise.all([
     db.people.toArray(),
     db.groups.toArray(),
     db.meetups.orderBy('date').toArray(),
     db.savedPlaces.toArray(),
     db.savedActivities.toArray(),
+    db.circles.toArray(),
   ])
 
 
-  return { version: 1, exportedAt: now, people, groups, meetups, savedPlaces, savedActivities }
+  return { version: 1, exportedAt: now, people, groups, meetups, savedPlaces, savedActivities, circles }
 }
 
 const countInvalid = (records: unknown[], schema: GenericSchema) =>
   records.filter((record) => !safeParse(schema, record).success).length
 
 export function countBadRecords(fileText: string): number {
-  const { people, groups, meetups, savedPlaces = [], savedActivities = [] } = JSON.parse(fileText)
+  const { people, groups, meetups, savedPlaces = [], savedActivities = [], circles = [] } = JSON.parse(fileText)
 
   return (
     countInvalid(people, personSchema) +
     countInvalid(groups, groupSchema) +
     countInvalid(meetups, meetupSchema) +
     countInvalid(savedPlaces, savedChoiceSchema) +
-    countInvalid(savedActivities, savedChoiceSchema)
+    countInvalid(savedActivities, savedChoiceSchema) +
+    countInvalid(circles, circleSchema)
   )
 }
 
 export async function restoreBackup(backup: Backup): Promise<void> {
-  const { people, groups, meetups, hiddenPlaces = [], savedPlaces, savedActivities } = backup
+  const { people, groups, meetups, hiddenPlaces = [], savedPlaces, savedActivities, circles = [] } = backup
   const chipsTheFileShowed = initialSavedLists(meetups, hiddenPlaces)
+  const tables = [db.people, db.groups, db.meetups, db.savedPlaces, db.savedActivities, db.circles]
 
-  await db.transaction('rw', [db.people, db.groups, db.meetups, db.savedPlaces, db.savedActivities], async () => {
-    await Promise.all([
-      db.people.clear(),
-      db.groups.clear(),
-      db.meetups.clear(),
-      db.savedPlaces.clear(),
-      db.savedActivities.clear(),
-    ])
+  await db.transaction('rw', tables, async () => {
+    await Promise.all(tables.map((table) => table.clear()))
     await Promise.all([
       db.people.bulkPut(people),
       db.groups.bulkPut(groups),
       db.meetups.bulkPut(meetups),
       db.savedPlaces.bulkPut(savedPlaces ?? chipsTheFileShowed.places),
       db.savedActivities.bulkPut(savedActivities ?? chipsTheFileShowed.activities),
+      db.circles.bulkPut(circles),
     ])
   })
 }

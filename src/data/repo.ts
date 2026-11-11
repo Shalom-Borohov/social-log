@@ -3,7 +3,7 @@ import { isUnused } from '../domain/person'
 import type { Group, Meetup, MeetupDraft, Person } from '../domain/types'
 import { db } from './db'
 
-const newId = () => crypto.randomUUID()
+export const newId = () => crypto.randomUUID()
 
 export function cleanDraft({ activities, initiator, note, groupId, ...required }: MeetupDraft): MeetupDraft {
   const trimmedNote = note?.trim()
@@ -38,15 +38,23 @@ export async function addPerson(name: string): Promise<Person> {
 }
 
 export async function forgetUnusedPeople(ids: string[]) {
-  await db.transaction('rw', db.people, db.groups, db.meetups, async () => {
+  await db.transaction('rw', [db.people, db.groups, db.meetups, db.circles], async () => {
     const groups = await db.groups.toArray()
+    const forgotten = new Set<string>()
 
     for (const id of ids) {
       const meetups = await db.meetups.where('personIds').equals(id).toArray()
 
       if (isUnused(id, meetups, groups)) {
         await db.people.delete(id)
+        forgotten.add(id)
       }
+    }
+
+    if (forgotten.size > 0) {
+      await db.circles.toCollection().modify((circle) => {
+        circle.memberIds = circle.memberIds.filter((memberId) => !forgotten.has(memberId))
+      })
     }
   })
 }

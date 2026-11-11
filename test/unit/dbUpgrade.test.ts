@@ -36,6 +36,7 @@ describe('the database', () => {
     expect(names(inSavedOrder(await allSavedChoices('activity')))).toEqual([...ACTIVITY_PRESETS, 'שש-בש', 'סנובורד'])
     expect(db.tables.map(({ name }) => name)).not.toContain('hiddenPlaces')
     expect(await db.meetups.count()).toBe(3)
+    expect(await db.circles.count()).toBe(0)
   })
 
   it('starts a new phone with the preset activities and no places', async () => {
