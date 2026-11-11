@@ -67,6 +67,7 @@ Personal iPhone PWA for logging meetups with friends: who, when, where, how long
     - **People:** someone can be in several circles. Being in a circle doesn't keep a person from being forgotten (decision 19) or deleted (decision 26), and either takes them out of every circle. A circle may be empty. Like a group's, a circle's members aren't checked when a backup is imported.
     - **Nothing else changes:** Orbit, כולם, the nudge, the person page and the sentence don't show circles.
     - Why: issue #15; some friends belong to separate worlds without being a fixed group, and the user chose circles that narrow the מי chips, set up in הגדרות where a whole circle can be ticked at once, over ordering by who met together or filtering Orbit.
+35. **App icon (added 2026-11-11):** the icon is the friends orbit on ink navy `#141A33`: a pale centre dot, two faint rings and three friend dots at different distances (pale `#EEF1FA`, `#8C95FF`, `#6E7BEA`). It uses only the app's colour tokens. `public/favicon.svg` is the source; `icon-192.png` and `icon-512.png` are rendered from it with rounded corners, and `apple-touch-icon.png` is the same mark on a full square, because iOS rounds the corners itself. Why: the owner disliked the first icon, two overlapping circles, which said nothing about the app; the orbit is the one screen only this app has. Chosen from eight sketches on 2026-11-11.
 
 ## Assumptions (accepted by the user)
 
