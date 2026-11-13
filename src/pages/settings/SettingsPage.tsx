@@ -71,6 +71,7 @@ export function SettingsPage() {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+        <FeedbackSettings />
         <IonListHeader>
           <IonLabel>{SETTINGS_COPY.backup}</IonLabel>
         </IonListHeader>
@@ -94,7 +95,6 @@ export function SettingsPage() {
         <FriendsSettings />
         <CirclesSettings />
 
-        <FeedbackSettings />
         <VersionSettings />
         <input {...fileInputProps} />
       </IonContent>

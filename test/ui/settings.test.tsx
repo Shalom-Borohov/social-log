@@ -89,8 +89,22 @@ describe('settings', () => {
       meetups: [walk],
       savedPlaces: [{ name: 'בים', savedAt: NOW }],
       savedActivities: [{ name: 'טיול', savedAt: NOW }],
-      circles: [friendsFromWork],
+      circles: [{ id: 'family', name: 'משפחה', memberIds: [] }, friendsFromWork],
     })
+  })
+
+  it('puts the bug and idea report first, above the backup', async () => {
+    renderAt(SETTINGS)
+
+    const firstList = await waitFor(() => {
+      const list = document.querySelector('ion-content ion-list')
+
+      expect(list).not.toBeNull()
+
+      return list
+    })
+
+    expect(firstList).toHaveTextContent('דיווח על באג / הצעה')
   })
 
   it('says there was no backup yet, and that the data stays on this phone', async () => {

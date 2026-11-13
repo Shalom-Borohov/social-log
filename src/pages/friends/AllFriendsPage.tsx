@@ -12,16 +12,18 @@ import {
   IonToolbar,
 } from '@ionic/react'
 import { COMMON_COPY } from '../../copy/common'
-import { useMeetups, usePeople } from '../../data/hooks'
+import { useMeetups } from '../../data/hooks'
+import type { PeopleTab } from '../../domain/circles'
 import { peopleBySince } from '../../domain/orbit'
 import { useToday } from '../../hooks/useToday'
-import { FRIENDS_PATH, personPath } from '../../navigation/paths'
+import { personPath, tabPath } from '../../navigation/paths'
 import { FRIENDS_COPY } from './copy'
 import { agoLabel } from './sinceLabel'
+import { useTabPeople } from './useTabPeople'
 
-export function AllFriendsPage() {
+export function AllFriendsPage({ tab }: { tab: PeopleTab }) {
   const today = useToday()
-  const people = usePeople()
+  const people = useTabPeople(tab)
   const meetups = useMeetups()
 
   return (
@@ -29,7 +31,7 @@ export function AllFriendsPage() {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref={FRIENDS_PATH} text={COMMON_COPY.friends} />
+            <IonBackButton defaultHref={tabPath(tab)} text={COMMON_COPY[tab]} />
           </IonButtons>
           <IonTitle>{FRIENDS_COPY.everyone}</IonTitle>
         </IonToolbar>
@@ -38,7 +40,7 @@ export function AllFriendsPage() {
         {people && meetups && (
           <IonList inset>
             {peopleBySince(people, meetups, today).map(({ person, daysSince }) => (
-              <IonItem key={person.id} button routerLink={personPath(person.id)}>
+              <IonItem key={person.id} button routerLink={personPath(tab, person.id)}>
                 <IonLabel>
                   <h2>{person.name}</h2>
                   {person.hidden && <p>{COMMON_COPY.hiddenFromOrbit}</p>}

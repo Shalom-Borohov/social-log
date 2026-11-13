@@ -60,11 +60,19 @@ describe('backup', () => {
     expect(await allCircles()).toStrictEqual(before)
   })
 
-  it('imports a file without circles as having none', async () => {
+  it('imports a file without circles as having only an empty משפחה', async () => {
     await saveCircle('צבא')
     await restoreBackup(parseBackup(JSON.stringify({ version: 1, exportedAt, people: [], groups: [], meetups: [] })))
 
-    expect(await allCircles()).toEqual([])
+    expect(await allCircles()).toEqual([{ id: 'family', name: 'משפחה', memberIds: [] }])
+  })
+
+  it('makes an imported circle named משפחה the built-in one', async () => {
+    const circles = [{ id: 'circle-7', name: 'משפחה', memberIds: ['mom'] }]
+
+    await restoreBackup(parseBackup(JSON.stringify({ version: 1, exportedAt, people: [], groups: [], meetups: [], circles })))
+
+    expect(await allCircles()).toEqual([{ id: 'family', name: 'משפחה', memberIds: ['mom'] }])
   })
 
   it('round-trips the saved places and activities in their order', async () => {

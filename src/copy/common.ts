@@ -3,6 +3,7 @@ import type { ChoiceKind } from '../domain/types'
 export const COMMON_COPY = {
   calendar: 'לוח שנה',
   friends: 'חברים',
+  family: 'משפחה',
   newMeetup: 'מפגש חדש',
   settings: 'הגדרות',
   cancel: 'ביטול',
@@ -14,6 +15,7 @@ export const COMMON_COPY = {
   rename: 'שינוי שם',
   name: 'שם',
   nameTaken: (name: string) => `כבר יש חבר בשם ${name}`,
+  familyCircleTaken: 'כבר יש מעגל בשם משפחה',
   choiceTaken: {
     place: (name: string) => `כבר יש מקום בשם „${name}”`,
     activity: (name: string) => `כבר יש פעילות בשם „${name}”`,

@@ -19,14 +19,14 @@ const membersOf = async (circleId: string) =>
 describe('circles', () => {
   beforeEach(resetDb)
 
-  it('saves a trimmed name with no members and lists circles by name', async () => {
+  it('saves a trimmed name with no members and lists משפחה first, then circles by name', async () => {
     await saveCircle(' צבא ')
     await saveCircle('עבודה')
-    await saveCircle('משפחה')
+    await saveCircle('אחים')
 
     const circles = await allCircles()
 
-    expect(circles.map(({ name }) => name)).toEqual(['משפחה', 'עבודה', 'צבא'])
+    expect(circles.map(({ name }) => name)).toEqual(['משפחה', 'אחים', 'עבודה', 'צבא'])
     expect(circles.every(({ memberIds }) => memberIds.length === 0)).toBe(true)
   })
 
@@ -36,7 +36,16 @@ describe('circles', () => {
     await renameCircle(id, ' העבודה ')
     await renameCircle(id, '  ')
 
-    expect(await circleNames()).toEqual(['העבודה'])
+    expect(await circleNames()).toEqual(['משפחה', 'העבודה'])
+  })
+
+  it('refuses a new circle or a new name that is משפחה, since משפחה is built in', async () => {
+    const { id } = await saveCircle('עבודה')
+
+    await expect(saveCircle(' משפחה ')).rejects.toThrow('כבר יש מעגל בשם משפחה')
+    await expect(renameCircle(id, 'משפחה')).rejects.toThrow('כבר יש מעגל בשם משפחה')
+
+    expect(await circleNames()).toEqual(['משפחה', 'עבודה'])
   })
 
   it('deletes a circle', async () => {
@@ -45,7 +54,7 @@ describe('circles', () => {
     await saveCircle('צבא')
     await deleteCircle(id)
 
-    expect(await circleNames()).toEqual(['צבא'])
+    expect(await circleNames()).toEqual(['משפחה', 'צבא'])
   })
 
   it('adds and removes one member at a time', async () => {

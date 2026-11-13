@@ -3,11 +3,12 @@ import { useParams } from 'react-router-dom'
 import { COMMON_COPY } from '../../copy/common'
 import { useGroups, useMeetups, usePeople } from '../../data/hooks'
 import { NameTakenError, renamePerson } from '../../data/repo'
+import type { PeopleTab } from '../../domain/circles'
 import { personSummary } from '../../domain/person'
 import type { Group, Meetup, Person } from '../../domain/types'
 import { useNamePrompt } from '../../hooks/useNamePrompt'
 import { useToast } from '../../hooks/useToast'
-import { FRIENDS_PATH } from '../../navigation/paths'
+import { tabPath } from '../../navigation/paths'
 import { FRIENDS_COPY } from './copy'
 import { MeetupHistory } from './MeetupHistory'
 import { PersonSummaryList } from './PersonSummaryList'
@@ -31,7 +32,7 @@ function PersonDetails({ person, people, groups, meetups }: PersonDetailsProps) 
   )
 }
 
-export function PersonPage() {
+export function PersonPage({ tab }: { tab: PeopleTab }) {
   const { personId } = useParams()
   const people = usePeople()
   const groups = useGroups()
@@ -63,7 +64,7 @@ export function PersonPage() {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref={FRIENDS_PATH} text={COMMON_COPY.friends} />
+            <IonBackButton defaultHref={tabPath(tab)} text={COMMON_COPY[tab]} />
           </IonButtons>
           <IonTitle>{person?.name}</IonTitle>
           {person && (
