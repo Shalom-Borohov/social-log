@@ -2,6 +2,14 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.7.0',
+    features: [
+      'לשונית משפחה: מסלול, תזכורת ורשימה משלה לבני המשפחה, שמסמנים במעגל משפחה בהגדרות',
+      'דיווח על באג או הצעה נמצא עכשיו בראש ההגדרות',
+    ],
+    fixes: [],
+  },
+  {
     version: '1.6.1',
     features: [],
     fixes: ['לאפליקציה יש אייקון חדש: מסלול החברים'],

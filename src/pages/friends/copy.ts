@@ -1,10 +1,15 @@
+import type { PeopleTab } from '../../domain/circles'
+
 export const FRIENDS_COPY = {
   orbitTitle: 'מי קרוב אליך עכשיו',
   orbitSubtitle: 'ככל שעיגול רחוק יותר, עבר יותר זמן',
   everyone: 'כולם',
   me: 'אני',
   ringLabels: ['השבוע', 'החודש', 'מזמן'],
-  emptyOrbit: 'כאן יופיעו החברים אחרי המפגש הראשון',
+  emptyOrbit: {
+    friends: 'כאן יופיעו החברים אחרי המפגש הראשון',
+    family: 'כאן יופיעו בני המשפחה אחרי המפגש הראשון',
+  } satisfies Record<PeopleTab, string>,
   day: 'יום',
   twoDays: 'יומיים',
   days: (count: number) => `${count} ימים`,
@@ -25,4 +30,6 @@ export const FRIENDS_COPY = {
   initiated: (mine: number, total: number) => `יזמת ${mine} מתוך ${total}`,
   history: 'מפגשים',
   personNotFound: 'החבר הזה לא נמצא',
+  noFamilyYet: 'עוד לא סימנת מי מהמשפחה',
+  pickFamily: 'בחירת בני משפחה',
 } as const

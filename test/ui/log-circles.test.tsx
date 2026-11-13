@@ -78,11 +78,21 @@ describe('narrowing מי to a circle', () => {
     expect(await circleChip('כולם')).toHaveAttribute('aria-pressed', 'false')
   })
 
-  it('shows no circle row when there are no circles', async () => {
+  it('shows no circle row while the only circle is an empty משפחה', async () => {
     renderAt('/log')
 
     await waitFor(async () => expect(await personChips()).toEqual(['מאיה', 'נועם', 'תמר']))
     expect(screen.queryByRole('group', { name: CIRCLE_ROW })).not.toBeInTheDocument()
+  })
+
+  it('offers משפחה first once someone is in it', async () => {
+    await storeWorkCircle()
+    await joinCircle('family', ['maya'])
+    renderAt('/log')
+
+    const chips = within(await screen.findByRole('group', { name: CIRCLE_ROW })).getAllByRole('button')
+
+    expect(chips.map((chip) => chip.textContent)).toEqual(['כולם', 'משפחה', 'עבודה'])
   })
 
   it('keeps people picked outside the circle on screen and picked', async () => {

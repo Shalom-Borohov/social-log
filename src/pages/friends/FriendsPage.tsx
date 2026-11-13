@@ -8,28 +8,44 @@ import {
   IonToolbar,
   useIonRouter,
 } from '@ionic/react'
-import { useMeetups, usePeople } from '../../data/hooks'
-import { orbitPeople } from '../../domain/orbit'
+import { useMeetups } from '../../data/hooks'
+import { FAMILY_CIRCLE_ID, type PeopleTab } from '../../domain/circles'
+import { orbitPeople, peopleBySince } from '../../domain/orbit'
 import { personSummary } from '../../domain/person'
 import { mostOverdue } from '../../domain/rhythm'
 import type { Meetup, Person } from '../../domain/types'
 import { useToday } from '../../hooks/useToday'
-import { ALL_FRIENDS_PATH, personPath } from '../../navigation/paths'
+import { allPeoplePath, circleSettingsPath, personPath } from '../../navigation/paths'
 import { FRIENDS_COPY } from './copy'
 import { NudgeCard } from './NudgeCard'
 import { OrbitField } from './OrbitField'
+import { useTabPeople } from './useTabPeople'
 import './friends.css'
 
 interface FriendsOrbitProps {
+  tab: PeopleTab
   people: Person[]
   meetups: Meetup[]
   today: string
   onOpen: (personId: string) => void
 }
 
-function FriendsOrbit({ people, meetups, today, onOpen }: FriendsOrbitProps) {
-  if (meetups.length === 0) {
-    return <p className="friends-empty">{FRIENDS_COPY.emptyOrbit}</p>
+function NoFamilyYet() {
+  return (
+    <div className="friends-empty">
+      <p>{FRIENDS_COPY.noFamilyYet}</p>
+      <IonButton routerLink={circleSettingsPath(FAMILY_CIRCLE_ID)}>{FRIENDS_COPY.pickFamily}</IonButton>
+    </div>
+  )
+}
+
+function FriendsOrbit({ tab, people, meetups, today, onOpen }: FriendsOrbitProps) {
+  if (tab === 'family' && people.length === 0) {
+    return <NoFamilyYet />
+  }
+
+  if (peopleBySince(people, meetups, today).every(({ daysSince }) => daysSince === null)) {
+    return <p className="friends-empty">{FRIENDS_COPY.emptyOrbit[tab]}</p>
   }
 
   const orbit = orbitPeople(people, meetups, today)
@@ -50,9 +66,9 @@ function FriendsOrbit({ people, meetups, today, onOpen }: FriendsOrbitProps) {
   )
 }
 
-export function FriendsPage() {
+export function FriendsPage({ tab }: { tab: PeopleTab }) {
   const today = useToday()
-  const people = usePeople()
+  const people = useTabPeople(tab)
   const meetups = useMeetups()
   const router = useIonRouter()
 
@@ -62,7 +78,7 @@ export function FriendsPage() {
         <IonToolbar>
           <IonTitle>{FRIENDS_COPY.orbitTitle}</IonTitle>
           <IonButtons slot="end">
-            <IonButton routerLink={ALL_FRIENDS_PATH}>{FRIENDS_COPY.everyone}</IonButton>
+            <IonButton routerLink={allPeoplePath(tab)}>{FRIENDS_COPY.everyone}</IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
@@ -77,10 +93,11 @@ export function FriendsPage() {
         <p className="friends-subtitle">{FRIENDS_COPY.orbitSubtitle}</p>
         {people && meetups && (
           <FriendsOrbit
+            tab={tab}
             people={people}
             meetups={meetups}
             today={today}
-            onOpen={(personId) => router.push(personPath(personId))}
+            onOpen={(personId) => router.push(personPath(tab, personId))}
           />
         )}
       </IonContent>

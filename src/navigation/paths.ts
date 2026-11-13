@@ -1,12 +1,16 @@
+import type { PeopleTab } from '../domain/circles'
+
 const TABS_PATH = '/tabs'
 
-export type Tab = 'calendar' | 'friends'
+export type Tab = 'calendar' | PeopleTab
 
 export const tabPath = (tab: Tab) => `${TABS_PATH}/${tab}`
 
 export const CALENDAR_PATH = tabPath('calendar')
 
 export const FRIENDS_PATH = tabPath('friends')
+
+export const FAMILY_PATH = tabPath('family')
 
 export const SETTINGS_PATH = `${CALENDAR_PATH}/settings`
 
@@ -16,9 +20,9 @@ export const SETTINGS_CIRCLES_PATH = `${SETTINGS_PATH}/circles`
 
 export const circleSettingsPath = (circleId: string) => `${SETTINGS_CIRCLES_PATH}/${circleId}`
 
-export const ALL_FRIENDS_PATH = `${FRIENDS_PATH}/all`
+export const allPeoplePath = (tab: PeopleTab) => `${tabPath(tab)}/all`
 
-export const personPath = (personId: string) => `${FRIENDS_PATH}/person/${personId}`
+export const personPath = (tab: PeopleTab, personId: string) => `${tabPath(tab)}/person/${personId}`
 
 export const NEW_MEETUP_PATH = '/log'
 

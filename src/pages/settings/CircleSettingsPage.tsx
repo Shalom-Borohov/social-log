@@ -19,22 +19,26 @@ import { useParams } from 'react-router-dom'
 import { COMMON_COPY } from '../../copy/common'
 import { deleteCircle, renameCircle, setCircleMember } from '../../data/circles'
 import { useCircles, usePeople } from '../../data/hooks'
+import { isFamilyCircle } from '../../domain/circles'
 import type { Circle } from '../../domain/types'
 import { useNamePrompt } from '../../hooks/useNamePrompt'
 import { useSave } from '../../hooks/useSave'
 import { SETTINGS_CIRCLES_PATH } from '../../navigation/paths'
 import { SETTINGS_COPY } from './copy'
+import { useCircleSave } from './useCircleSave'
 
 export function CircleSettingsPage() {
   const { circleId } = useParams()
   const circles = useCircles()
   const circle = circles?.find(({ id }) => id === circleId)
   const missing = circles !== undefined && circle === undefined
+  const editable = circle !== undefined && !isFamilyCircle(circle)
   const people = usePeople() ?? []
   const router = useIonRouter()
   const [presentAlert] = useIonAlert()
   const promptName = useNamePrompt()
   const save = useSave()
+  const saveName = useCircleSave()
 
   const backToCircles = useEffectEvent(() => {
     if (router.canGoBack()) {
@@ -57,7 +61,7 @@ export function CircleSettingsPage() {
       header: COMMON_COPY.rename,
       label: COMMON_COPY.name,
       name,
-      onName: (newName) => void save(renameCircle(id, newName)),
+      onName: (newName) => void saveName(renameCircle(id, newName)),
     })
   }
 
@@ -80,7 +84,7 @@ export function CircleSettingsPage() {
             <IonBackButton defaultHref={SETTINGS_CIRCLES_PATH} text={SETTINGS_COPY.circles} />
           </IonButtons>
           <IonTitle>{circle?.name}</IonTitle>
-          {circle && (
+          {editable && (
             <IonButtons slot="end">
               <IonButton onClick={() => rename(circle)}>{COMMON_COPY.rename}</IonButton>
             </IonButtons>
@@ -104,11 +108,13 @@ export function CircleSettingsPage() {
                 </IonItem>
               ))}
             </IonList>
-            <IonList inset>
-              <IonItem button detail={false} onClick={() => confirmDelete(circle)}>
-                <IonLabel color="danger">{COMMON_COPY.delete}</IonLabel>
-              </IonItem>
-            </IonList>
+            {editable && (
+              <IonList inset>
+                <IonItem button detail={false} onClick={() => confirmDelete(circle)}>
+                  <IonLabel color="danger">{COMMON_COPY.delete}</IonLabel>
+                </IonItem>
+              </IonList>
+            )}
           </>
         )}
       </IonContent>

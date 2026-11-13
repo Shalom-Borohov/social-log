@@ -13,6 +13,7 @@ import {
   alertMessage,
   alertShown,
   clickAlertButton,
+  toasts,
   typeInAlert,
 } from '../helpers/overlays'
 import { currentPath, renderAt } from '../helpers/renderAt'
@@ -65,7 +66,7 @@ describe('the circles row in הגדרות', () => {
 
     const row = (await screen.findByText('מעגלים')).closest('ion-item')
 
-    expect(row).toHaveTextContent('2')
+    expect(row).toHaveTextContent('3')
 
     fireEvent.click(await screen.findByText('מעגלים'))
 
@@ -79,17 +80,20 @@ describe('the circles page', () => {
     await store({ people })
   })
 
-  it('lists the circles by name with how many people are in each', async () => {
+  it('lists משפחה first, then the circles by name, with how many people are in each', async () => {
     await db.circles.bulkPut([army, work])
     renderAt(CIRCLES_PAGE)
 
-    await expectInOrder(['עבודה', 'צבא'])
+    const list = (await screen.findByText('עבודה')).closest('ion-list')
+    const rowNames = () => Array.from(list?.querySelectorAll('ion-item ion-label') ?? []).map((label) => label.textContent)
+
+    expect(rowNames()).toEqual(['משפחה', 'עבודה', 'צבא', 'מעגל חדש'])
     expect(screen.getByText('אדם אחד')).toBeInTheDocument()
-    expect(screen.getByText('0 אנשים')).toBeInTheDocument()
+    expect(screen.getAllByText('0 אנשים')).toHaveLength(2)
     expect(screen.queryByText(CIRCLE_EXPLAINED)).not.toBeInTheDocument()
   })
 
-  it('explains what a circle is for before there are any', async () => {
+  it('explains what a circle is for while משפחה is the only one', async () => {
     renderAt(CIRCLES_PAGE)
 
     expect(await screen.findByText(CIRCLE_EXPLAINED)).toBeInTheDocument()
@@ -116,6 +120,21 @@ describe('the circles page', () => {
 
     await waitFor(() => expect(currentPath()).toMatch(/^\/tabs\/calendar\/settings\/circles\/.+/))
     await expectTitle('שכונה')
+  })
+
+  it('says משפחה already exists instead of making a second one', async () => {
+    renderAt(CIRCLES_PAGE)
+
+    const shown = alertShown()
+
+    fireEvent.click(await screen.findByText('מעגל חדש'))
+    await shown
+    typeInAlert('משפחה')
+    clickAlertButton('שמירה')
+
+    await waitFor(() => expect(toasts()).toEqual(['כבר יש מעגל בשם משפחה']))
+    expect(currentPath()).toBe(CIRCLES_PAGE)
+    expect(await db.circles.count()).toBe(1)
   })
 })
 
@@ -159,7 +178,9 @@ describe('a circle page', () => {
     ionEvent(await checkboxOf('נועם'), 'ionChange', { checked: false })
     ionEvent(await checkboxOf('דנה'), 'ionChange', { checked: false })
     await goBackToCircles()
-    expect(await screen.findByText('0 אנשים')).toBeInTheDocument()
+    await waitFor(async () =>
+      expect((await screen.findByText('עבודה')).closest('ion-item')).toHaveTextContent('0 אנשים'),
+    )
   })
 
   it('renames the circle', async () => {
@@ -219,5 +240,23 @@ describe('a circle page', () => {
     renderAt(`${CIRCLES_PAGE}/nowhere`)
 
     await waitFor(() => expect(currentPath()).toBe(CIRCLES_PAGE))
+  })
+})
+
+describe('the משפחה circle page', () => {
+  beforeEach(async () => {
+    await resetDb()
+    await store({ people })
+  })
+
+  it('ticks family members but has no rename or delete', async () => {
+    renderAt(`${CIRCLES_PAGE}/family`)
+    await expectTitle('משפחה')
+
+    ionEvent(await checkboxOf('נועם'), 'ionChange', { checked: true })
+
+    await waitFor(async () => expect((await db.circles.get('family'))?.memberIds).toEqual(['noam']))
+    expect(screen.queryByText('שינוי שם')).not.toBeInTheDocument()
+    expect(screen.queryByText('מחיקה')).not.toBeInTheDocument()
   })
 })

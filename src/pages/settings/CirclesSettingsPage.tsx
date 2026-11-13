@@ -17,8 +17,9 @@ import { add } from 'ionicons/icons'
 import { COMMON_COPY } from '../../copy/common'
 import { saveCircle } from '../../data/circles'
 import { useCircles } from '../../data/hooks'
+import { isFamilyCircle } from '../../domain/circles'
 import { useNamePrompt } from '../../hooks/useNamePrompt'
-import { useSave } from '../../hooks/useSave'
+import { useCircleSave } from './useCircleSave'
 import { circleSettingsPath, SETTINGS_PATH } from '../../navigation/paths'
 import { SETTINGS_COPY } from './copy'
 
@@ -26,7 +27,7 @@ export function CirclesSettingsPage() {
   const circles = useCircles()
   const promptName = useNamePrompt()
   const router = useIonRouter()
-  const save = useSave()
+  const save = useCircleSave()
 
   function createCircle() {
     promptName({
@@ -59,7 +60,9 @@ export function CirclesSettingsPage() {
             <IonLabel>{SETTINGS_COPY.newCircle}</IonLabel>
           </IonItem>
         </IonList>
-        {circles?.length === 0 && <IonNote className="list-footer">{SETTINGS_COPY.circlesExplained}</IonNote>}
+        {circles?.every(isFamilyCircle) && (
+          <IonNote className="list-footer">{SETTINGS_COPY.circlesExplained}</IonNote>
+        )}
       </IonContent>
     </IonPage>
   )

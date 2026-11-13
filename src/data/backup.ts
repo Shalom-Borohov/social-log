@@ -18,6 +18,7 @@ import {
 } from 'valibot'
 import { APP_COPY } from '../copy/app'
 import { initialSavedLists } from '../domain/choices'
+import { withFamilyCircle } from '../domain/circles'
 import { isIsoDate, logicalToday, MINUTES_PER_HOUR } from '../domain/logicalDay'
 import { type Circle, type Group, INITIATORS, type Meetup, type Person, RATINGS, type SavedChoice } from '../domain/types'
 import { db } from './db'
@@ -150,7 +151,7 @@ export async function restoreBackup(backup: Backup): Promise<void> {
       db.meetups.bulkPut(meetups),
       db.savedPlaces.bulkPut(savedPlaces ?? chipsTheFileShowed.places),
       db.savedActivities.bulkPut(savedActivities ?? chipsTheFileShowed.activities),
-      db.circles.bulkPut(circles),
+      db.circles.bulkPut(withFamilyCircle(circles)),
     ])
   })
 }
