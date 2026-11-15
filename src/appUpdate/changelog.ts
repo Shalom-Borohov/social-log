@@ -2,6 +2,11 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.9.0',
+    features: ['בשלב מי, ה־✕ בעריכה מוחק מי שלא מופיע באף מפגש או קבוצה, ומסתיר את כל השאר'],
+    fixes: [],
+  },
+  {
     version: '1.8.0',
     features: ['מועדפים: מסמנים חבר בעמוד שלו, והוא מופיע ראשון בבחירת מי'],
     fixes: ['לחיצה נוספת על קבוצה שנבחרה מבטלת את הבחירה'],

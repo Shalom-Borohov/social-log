@@ -1,11 +1,10 @@
 import { useId, useState } from 'react'
 import { joinCircle } from '../../data/circles'
-import { addPerson, setPersonHidden } from '../../data/repo'
+import { addPerson } from '../../data/repo'
 import { chipPeople } from '../../domain/circles'
 import { GROUP_MINIMUM, groupSuggestion } from '../../domain/groupSuggestion'
 import { peopleLabel, sameMembers } from '../../domain/sentence'
 import type { Circle, Group, Meetup, Person } from '../../domain/types'
-import { useRemoveWithUndo } from '../../hooks/useRemoveWithUndo'
 import { useSave } from '../../hooks/useSave'
 import { LOG_COPY } from './copy'
 import { type DraftFields, toggledIn } from './meetupDraft'
@@ -13,6 +12,7 @@ import { AddField } from './AddField'
 import { CircleFilter } from './CircleFilter'
 import { Chip, ChipGroup, EditToggle, LabelledChipGroup, MainAction, Panel, RemoveChip } from './Panel'
 import { useChipEditing } from './useChipEditing'
+import { usePersonChipRemoval } from './usePersonChipRemoval'
 import { useGroupPrompt } from './useGroupPrompt'
 import { useSplitPrompt } from './useSplitPrompt'
 
@@ -62,16 +62,9 @@ export function PeoplePanel({
   const askGroupName = useGroupPrompt((group) => onChange({ groupId: group.id }))
   const askSplit = useSplitPrompt()
   const { editing, toggleEditing } = useChipEditing()
-  const hideWithUndo = useRemoveWithUndo()
+  const { removeLabel, remove } = usePersonChipRemoval(meetups, groups, circles)
   const shownPeople = chipPeople(people, personIds, circle)
   const anyUnpicked = shownPeople.some((person) => !personIds.includes(person.id))
-
-  const hide = (person: Person) =>
-    hideWithUndo(
-      () => setPersonHidden(person.id, true),
-      () => setPersonHidden(person.id, false),
-      LOG_COPY.personHidden(person.name),
-    )
 
   async function addPeople(names: string[]) {
     const added = await save(
@@ -139,8 +132,8 @@ export function PeoplePanel({
             <RemoveChip
               key={person.id}
               label={person.name}
-              removeLabel={LOG_COPY.hideChip(person.name)}
-              onRemove={() => void hide(person)}
+              removeLabel={removeLabel(person)}
+              onRemove={() => void remove(person)}
             />
           ) : (
             <Chip

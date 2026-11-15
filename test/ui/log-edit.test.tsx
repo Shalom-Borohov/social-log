@@ -51,6 +51,17 @@ describe('editing a meetup', () => {
     expect(await screen.findByLabelText('הערה')).toHaveValue('היה קר')
   })
 
+  it('hides rather than deletes someone unpicked from the meetup being edited', async () => {
+    renderAt('/log/walk')
+    await tapSlot('מי')
+    await tap('מאיה')
+    await tap('עריכה')
+
+    await tap('הסתרה: מאיה')
+
+    await waitFor(async () => expect((await db.people.get('maya'))?.hidden).toBe(true))
+  })
+
   it('saves the change over the same meetup', async () => {
     renderAt('/log/walk')
 
