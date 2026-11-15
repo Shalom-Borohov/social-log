@@ -140,9 +140,9 @@ describe('narrowing מי to a circle', () => {
     await tap('עריכה')
     await tapCircle('עבודה')
 
-    await waitFor(() => expect(screen.queryByRole('button', { name: 'הסתרה: מאיה' })).not.toBeInTheDocument())
-    expect(await findButton('הסתרה: נועם')).toBeInTheDocument()
-    expect(await findButton('הסתרה: תמר')).toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'מחיקה: מאיה' })).not.toBeInTheDocument())
+    expect(await findButton('מחיקה: נועם')).toBeInTheDocument()
+    expect(await findButton('מחיקה: תמר')).toBeInTheDocument()
   })
 })
 

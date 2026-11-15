@@ -53,6 +53,8 @@ export const LOG_COPY = {
   hideChip: (label: string) => `הסתרה: ${label}`,
   removeChip: (label: string) => `הסרה: ${label}`,
   personHidden: (name: string) => `הסתרת את ${name} מהרשימה ומהמסלול`,
+  deleteChip: (label: string) => `מחיקה: ${label}`,
+  personDeleted: (name: string) => `מחקת את ${name}`,
   otherDuration: 'אחר',
   hoursLabel: 'שעות',
   minutesLabel: 'דקות',

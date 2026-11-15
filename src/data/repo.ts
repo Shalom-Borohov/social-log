@@ -59,6 +59,18 @@ export async function forgetUnusedPeople(ids: string[]) {
   })
 }
 
+export async function restorePerson(person: Person, circleIds: string[]) {
+  await db.transaction('rw', [db.people, db.circles], async () => {
+    await db.people.put(person)
+    await db.circles
+      .where('id')
+      .anyOf(circleIds)
+      .modify((circle) => {
+        circle.memberIds = [...new Set([...circle.memberIds, person.id])]
+      })
+  })
+}
+
 export async function setPersonHidden(id: string, hidden: boolean) {
   await db.people.update(id, { hidden })
 }

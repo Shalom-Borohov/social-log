@@ -4,7 +4,7 @@ import { db } from '../../src/data/db'
 import { freezeDate } from '../helpers/clock'
 import { resetDb } from '../helpers/db'
 import { findButton, pressed, slot, tap, typeInto } from '../helpers/log'
-import { aGroup, aPerson } from '../helpers/meetups'
+import { aGroup, aMeetup, aPerson } from '../helpers/meetups'
 import { alertShown, clickAlertButton, clickToastButton, toasts, typeInAlert } from '../helpers/overlays'
 import { renderAt } from '../helpers/renderAt'
 
@@ -168,6 +168,7 @@ describe('מי', () => {
   })
 
   it('hides an unpicked person from the chips in עריכה, and ביטול brings them back', async () => {
+    await db.meetups.put(aMeetup({ personIds: ['noam'] }))
     renderAt('/log')
     await tap('תמר')
 
@@ -190,6 +191,40 @@ describe('מי', () => {
     expect((await db.people.get('noam'))?.hidden).toBe(false)
   })
 
+  it('hides someone in a group rather than deleting them', async () => {
+    await db.groups.put(army)
+    renderAt('/log')
+    await tap('עריכה')
+
+    await tap('הסתרה: נועם')
+
+    await waitFor(async () => expect((await db.people.get('noam'))?.hidden).toBe(true))
+  })
+
+  it('deletes someone in no meetup and no group in עריכה, and ביטול brings them back with their circles', async () => {
+    const favouriteNoam = { ...noam, favourite: true }
+
+    await db.people.put(favouriteNoam)
+    await db.circles.put({ id: 'work', name: 'עבודה', memberIds: ['tamar', 'noam'] })
+    renderAt('/log')
+    await tap('עריכה')
+
+    expect(screen.queryByRole('button', { name: 'הסתרה: נועם' })).not.toBeInTheDocument()
+
+    await tap('מחיקה: נועם')
+
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'מחיקה: נועם' })).not.toBeInTheDocument())
+    expect(await db.people.get('noam')).toBeUndefined()
+    expect((await db.circles.get('work'))?.memberIds).toEqual(['tamar'])
+    await waitFor(() => expect(toasts()).toContain('מחקת את נועם'))
+
+    clickToastButton('ביטול')
+
+    expect(await findButton('מחיקה: נועם')).toBeInTheDocument()
+    expect(await db.people.get('noam')).toEqual(favouriteNoam)
+    expect((await db.circles.get('work'))?.memberIds).toEqual(['tamar', 'noam'])
+  })
+
   it('offers עריכה only while someone is left unpicked', async () => {
     renderAt('/log')
     await tap('תמר')
@@ -203,6 +238,7 @@ describe('מי', () => {
   })
 
   it('keeps סיום after the last unpicked person is hidden, and unlocks the picked chips with it', async () => {
+    await db.meetups.put(aMeetup({ personIds: ['noam'] }))
     renderAt('/log')
     await tap('תמר')
     await tap('מאיה')

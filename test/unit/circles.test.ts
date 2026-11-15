@@ -7,7 +7,7 @@ import {
   saveCircle,
   setCircleMember,
 } from '../../src/data/circles'
-import { addMeetup, addPerson, allPeople, forgetUnusedPeople } from '../../src/data/repo'
+import { addMeetup, addPerson, allPeople, forgetUnusedPeople, restorePerson } from '../../src/data/repo'
 import { resetDb } from '../helpers/db'
 import { aMeetup } from '../helpers/meetups'
 
@@ -88,5 +88,27 @@ describe('circles', () => {
 
     expect((await allPeople()).map(({ name }) => name)).toEqual(['מאיה'])
     expect(await membersOf(id)).toEqual([maya.id])
+  })
+
+  it('restores a forgotten person whole, back in the circles that are still there', async () => {
+    const tamar = { ...(await addPerson('תמר')), hidden: true, favourite: true }
+    const maya = await addPerson('מאיה')
+    const work = await saveCircle('עבודה')
+    const army = await saveCircle('צבא')
+    const school = await saveCircle('תיכון')
+
+    await joinCircle(work.id, [maya.id, tamar.id])
+    await joinCircle(army.id, [tamar.id])
+    await joinCircle(school.id, [tamar.id])
+    await forgetUnusedPeople([tamar.id])
+    await deleteCircle(school.id)
+    await joinCircle(army.id, [tamar.id])
+
+    await restorePerson(tamar, [work.id, army.id, school.id])
+
+    expect(await allPeople()).toContainEqual(tamar)
+    expect(await membersOf(work.id)).toEqual([maya.id, tamar.id])
+    expect(await membersOf(army.id)).toEqual([tamar.id])
+    expect(await circleNames()).toEqual(['משפחה', 'עבודה', 'צבא'])
   })
 })
