@@ -30,10 +30,15 @@ export function withFamilyCircle(circles: Circle[]): Circle[] {
   return [...circles, { id: FAMILY_CIRCLE_ID, name: COMMON_COPY.family, memberIds: [] }]
 }
 
-export const chipPeople = (people: Person[], personIds: string[], circle: Circle | undefined) =>
-  people.filter((person) => {
+const isFavourite = (person: Person) => person.favourite === true
+
+export function chipPeople(people: Person[], personIds: string[], circle: Circle | undefined) {
+  const shown = people.filter((person) => {
     const picked = personIds.includes(person.id)
     const inCircle = circle === undefined || circle.memberIds.includes(person.id)
 
     return picked || (!person.hidden && inCircle)
   })
+
+  return [...shown.filter(isFavourite), ...shown.filter((person) => !isFavourite(person))]
+}

@@ -46,6 +46,47 @@ describe('מי', () => {
     expect(await slot('מי')).toHaveAccessibleName('מי: תמר ומאיה')
   })
 
+  it('clears the group and its people when the picked group is tapped again', async () => {
+    await db.groups.put(army)
+    renderAt('/log')
+
+    await tap('החבר׳ה מהצבא')
+    await tap('החבר׳ה מהצבא')
+
+    expect(await pressed('החבר׳ה מהצבא')).toBe('false')
+    expect(await pressed('תמר')).toBe('false')
+    expect(await pressed('מאיה')).toBe('false')
+    expect(await pressed('נועם')).toBe('false')
+    expect(await findButton('המשך')).toBeDisabled()
+  })
+
+  it('picks the whole group again when tapped after someone from it was dropped', async () => {
+    await db.groups.put(army)
+    renderAt('/log')
+
+    await tap('החבר׳ה מהצבא')
+    await tap('נועם')
+    await tap('החבר׳ה מהצבא')
+
+    expect(await pressed('נועם')).toBe('true')
+    expect(await pressed('החבר׳ה מהצבא')).toBe('true')
+    expect(await slot('מי')).toHaveAccessibleName('מי: החבר׳ה מהצבא')
+  })
+
+  it('shows favourites first in the names', async () => {
+    await db.people.update('noam', { favourite: true })
+    renderAt('/log')
+
+    await findButton('נועם')
+
+    const names = screen
+      .getAllByRole('button')
+      .map((button) => button.textContent)
+      .filter((name) => name === 'תמר' || name === 'מאיה' || name === 'נועם')
+
+    expect(names).toEqual(['נועם', 'מאיה', 'תמר'])
+  })
+
   it('toggles people on and off', async () => {
     renderAt('/log')
 

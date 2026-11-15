@@ -1,6 +1,6 @@
 import { IonItem, IonLabel, IonList, IonNote, IonToggle } from '@ionic/react'
 import { COMMON_COPY } from '../../copy/common'
-import { setPersonHidden } from '../../data/repo'
+import { setPersonFavourite, setPersonHidden } from '../../data/repo'
 import { dayLabel } from '../../domain/format'
 import type { PersonSummary } from '../../domain/person'
 import type { Person } from '../../domain/types'
@@ -45,6 +45,14 @@ export function PersonSummaryList({ person, summary }: PersonSummaryListProps) {
           onIonChange={(event) => void save(setPersonHidden(person.id, !event.detail.checked))}
         >
           {COMMON_COPY.showInOrbit}
+        </IonToggle>
+      </IonItem>
+      <IonItem>
+        <IonToggle
+          checked={person.favourite === true}
+          onIonChange={(event) => void save(setPersonFavourite(person.id, event.detail.checked))}
+        >
+          {FRIENDS_COPY.favourite}
         </IonToggle>
       </IonItem>
     </IonList>

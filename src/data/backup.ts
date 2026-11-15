@@ -47,7 +47,13 @@ export class InvalidBackupError extends Error {
   }
 }
 
-const personSchema = object({ id: string(), name: string(), hidden: boolean(), createdAt: number() })
+const personSchema = object({
+  id: string(),
+  name: string(),
+  hidden: boolean(),
+  favourite: optional(boolean()),
+  createdAt: number(),
+})
 
 const groupSchema = object({ id: string(), name: string(), memberIds: array(string()) })
 

@@ -4,7 +4,7 @@ import { db } from '../../src/data/db'
 import { freezeDate } from '../helpers/clock'
 import { resetDb } from '../helpers/db'
 import { store, TODAY_AT_TEN } from '../helpers/friends'
-import { expectInOrder, ionElement, ionEvent } from '../helpers/ionic'
+import { expectInOrder, ionElement, ionEvent, visibleAll } from '../helpers/ionic'
 import { aMeetup, aPerson } from '../helpers/meetups'
 import { alertShown, clickAlertButton, toasts, typeInAlert } from '../helpers/overlays'
 import { currentPath, renderAt } from '../helpers/renderAt'
@@ -150,6 +150,28 @@ describe('a person’s page', () => {
 
     ionEvent(toggle, 'ionChange', { checked: true })
     await waitFor(async () => expect((await db.people.get('tamar'))?.hidden).toBe(false))
+  })
+
+  it('marks them as a favourite and unmarks them', async () => {
+    renderAt(TAMAR_PAGE)
+
+    const toggle = await waitFor(() => {
+      const favouriteToggle = visibleAll('ion-toggle').find((element) => element.textContent === 'במועדפים')
+
+      if (!favouriteToggle) {
+        throw new Error('no במועדפים toggle')
+      }
+
+      return favouriteToggle
+    })
+
+    expect(toggle).toHaveProperty('checked', false)
+
+    ionEvent(toggle, 'ionChange', { checked: true })
+    await waitFor(async () => expect((await db.people.get('tamar'))?.favourite).toBe(true))
+
+    ionEvent(toggle, 'ionChange', { checked: false })
+    await waitFor(async () => expect((await db.people.get('tamar'))?.favourite).toBe(false))
   })
 
   it('says quietly when the person is not found', async () => {

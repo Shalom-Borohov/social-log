@@ -12,6 +12,7 @@ export interface Person {
   id: string
   name: string
   hidden: boolean
+  favourite?: boolean
   createdAt: number
 }
 
