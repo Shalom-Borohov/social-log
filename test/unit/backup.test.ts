@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { countBadRecords, exportBackup, InvalidBackupError, parseBackup, restoreBackup } from '../../src/data/backup'
-import { addMeetup, addPerson, allGroups, allMeetups, allPeople, saveGroup } from '../../src/data/repo'
+import { addMeetup, addPerson, allGroups, allMeetups, allPeople, saveGroup, setPersonFavourite } from '../../src/data/repo'
 import { allCircles, joinCircle, saveCircle } from '../../src/data/circles'
 import { allSavedChoices, saveChoices } from '../../src/data/savedChoices'
 import { inSavedOrder } from '../../src/domain/choices'
@@ -42,6 +42,21 @@ describe('backup', () => {
 
     expect(backup).toMatchObject({ version: 1, exportedAt })
     expect({ people: await allPeople(), groups: await allGroups(), meetups: await allMeetups() }).toStrictEqual(before)
+  })
+
+  it('round-trips favourites', async () => {
+    const tamar = await addPerson('תמר')
+
+    await addPerson('מאיה')
+    await setPersonFavourite(tamar.id, true)
+    const before = await allPeople()
+
+    const backup = parseBackup(JSON.stringify(await exportBackup(exportedAt)))
+
+    await resetDb()
+    await restoreBackup(backup)
+
+    expect(await allPeople()).toStrictEqual(before)
   })
 
   it('round-trips circles', async () => {

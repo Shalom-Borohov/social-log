@@ -25,4 +25,28 @@ describe('the people chips on מי', () => {
     expect(ids(chipPeople(people, ['noam'], work))).toEqual(['tamar', 'noam'])
     expect(ids(chipPeople(people, ['itay'], work))).toEqual(['tamar', 'itay'])
   })
+
+  it('puts favourites first, each part keeping the name order', () => {
+    const withFavourites = [
+      aPerson({ id: 'tamar' }),
+      aPerson({ id: 'maya', favourite: true }),
+      aPerson({ id: 'noam' }),
+      aPerson({ id: 'yael', favourite: true }),
+    ]
+
+    expect(ids(chipPeople(withFavourites, [], undefined))).toEqual(['maya', 'yael', 'tamar', 'noam'])
+  })
+
+  it('puts favourites first inside a circle too, and leaves a hidden favourite off until picked', () => {
+    const withFavourites = [
+      aPerson({ id: 'tamar' }),
+      aPerson({ id: 'maya', favourite: true }),
+      aPerson({ id: 'itay', hidden: true, favourite: true }),
+    ]
+
+    const everyone: Circle = { id: 'everyone', name: 'כולם', memberIds: ['tamar', 'maya', 'itay'] }
+
+    expect(ids(chipPeople(withFavourites, [], everyone))).toEqual(['maya', 'tamar'])
+    expect(ids(chipPeople(withFavourites, ['itay'], everyone))).toEqual(['maya', 'itay', 'tamar'])
+  })
 })

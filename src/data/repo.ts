@@ -63,6 +63,10 @@ export async function setPersonHidden(id: string, hidden: boolean) {
   await db.people.update(id, { hidden })
 }
 
+export async function setPersonFavourite(id: string, favourite: boolean) {
+  await db.people.update(id, { favourite })
+}
+
 export class NameTakenError extends Error {
   constructor(name: string) {
     super(COMMON_COPY.nameTaken(name))

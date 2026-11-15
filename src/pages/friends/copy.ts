@@ -32,4 +32,5 @@ export const FRIENDS_COPY = {
   personNotFound: 'החבר הזה לא נמצא',
   noFamilyYet: 'עוד לא סימנת מי מהמשפחה',
   pickFamily: 'בחירת בני משפחה',
+  favourite: 'במועדפים',
 } as const

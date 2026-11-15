@@ -110,15 +110,23 @@ export function PeoplePanel({
     >
       {groups.length > 0 && (
         <LabelledChipGroup label={LOG_COPY.groups}>
-          {groups.map((group) => (
-            <Chip
-              key={group.id}
-              label={group.name}
-              pressed={group.id === groupId && sameMembers(personIds, group)}
-              disabled={editing}
-              onClick={() => onChange({ personIds: group.memberIds, groupId: group.id })}
-            />
-          ))}
+          {groups.map((group) => {
+            const groupPicked = group.id === groupId && sameMembers(personIds, group)
+
+            return (
+              <Chip
+                key={group.id}
+                label={group.name}
+                pressed={groupPicked}
+                disabled={editing}
+                onClick={() =>
+                  onChange(
+                    groupPicked ? { personIds: [], groupId: undefined } : { personIds: group.memberIds, groupId: group.id },
+                  )
+                }
+              />
+            )
+          })}
         </LabelledChipGroup>
       )}
       <CircleFilter circles={circles} selectedId={circle?.id} onSelect={setCircleId} />
