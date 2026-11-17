@@ -2,6 +2,11 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.10.0',
+    features: ['בהגדרות › מראה בוחרים בהיר, כהה או אוטומטי לפי הטלפון'],
+    fixes: ['טוב בצבע טורקיז, כדי שלא ייראה כמו מעולה'],
+  },
+  {
     version: '1.9.0',
     features: ['בשלב מי, ה־✕ בעריכה מוחק מי שלא מופיע באף מפגש או קבוצה, ומסתיר את כל השאר'],
     fixes: [],

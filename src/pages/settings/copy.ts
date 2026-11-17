@@ -1,3 +1,4 @@
+import type { Appearance } from '../../appearance/appearance'
 import type { ChoiceKind } from '../../domain/types'
 
 export const SETTINGS_COPY = {
@@ -38,4 +39,10 @@ export const SETTINGS_COPY = {
     `${text}\n\n### מכשיר\n${userAgent}\nגרסה: ${version} (${builtAt})`,
   version: (version: string) => `גרסה ${version}`,
   updated: (date: string) => `עודכנה ${date}`,
+  appearance: 'מראה',
+  appearanceChoices: {
+    auto: 'אוטומטי',
+    light: 'בהיר',
+    dark: 'כהה',
+  } satisfies Record<Appearance, string>,
 } as const

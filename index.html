@@ -4,8 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
     <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#eef2f9" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0f1324" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#eef2f9" media="(prefers-color-scheme: light)" data-scheme="light" />
+    <meta name="theme-color" content="#0f1324" media="(prefers-color-scheme: dark)" data-scheme="dark" />
+    <script id="first-paint-appearance">
+      {
+        const chosenAppearance = localStorage.getItem('social-log:appearance')
+        const isChosen = chosenAppearance === 'light' || chosenAppearance === 'dark'
+        const phoneIsDark = matchMedia('(prefers-color-scheme: dark)').matches
+        const scheme = isChosen ? chosenAppearance : phoneIsDark ? 'dark' : 'light'
+        const root = document.documentElement
+        root.classList.toggle('ion-palette-dark', scheme === 'dark')
+        root.style.colorScheme = scheme
+        if (isChosen) {
+          document.querySelectorAll('meta[name="theme-color"][data-scheme]').forEach((meta) => {
+            meta.setAttribute('media', meta.dataset.scheme === scheme ? 'all' : 'not all')
+          })
+        }
+      }
+    </script>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="מפגשים" />

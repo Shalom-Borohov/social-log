@@ -4,24 +4,17 @@ import { setupIonicReact } from '@ionic/react'
 import { cleanup } from '@testing-library/react'
 import { afterEach, beforeEach } from 'vitest'
 import { saveSeenVersion } from '../src/appUpdate/seenVersion'
+import { fakeMatchMedia, resetPhoneScheme } from './helpers/phoneScheme'
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: (query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    dispatchEvent: () => false,
-  }),
+  value: fakeMatchMedia,
 })
 
 setupIonicReact({ mode: 'ios' })
 
 beforeEach(() => {
+  resetPhoneScheme()
   localStorage.clear()
   saveSeenVersion(__APP_VERSION__)
 })
