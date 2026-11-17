@@ -25,6 +25,7 @@ import { dateTimeLabel } from '../../domain/format'
 import { useSave } from '../../hooks/useSave'
 import { useToast } from '../../hooks/useToast'
 import { CALENDAR_PATH } from '../../navigation/paths'
+import { AppearanceSettings } from './AppearanceSettings'
 import { CirclesSettings } from './CirclesSettings'
 import { SETTINGS_COPY } from './copy'
 import { FeedbackSettings } from './FeedbackSettings'
@@ -94,6 +95,7 @@ export function SettingsPage() {
         <SavedChoicesSettings kind="activity" />
         <FriendsSettings />
         <CirclesSettings />
+        <AppearanceSettings />
 
         <VersionSettings />
         <input {...fileInputProps} />

@@ -79,11 +79,13 @@ Personal iPhone PWA for logging meetups with friends: who, when, where, how long
 38. **Tapping a picked group again (added 2026-11-15, clarifies 19):** on מי, tapping a group chip that is pressed (it was tapped or saved, and exactly its members are still picked) clears the people and the group. Members picked one by one don't press the chip; tapping it then names the group without changing who is picked. Tapping a group chip that isn't pressed still fills its members, including after someone from it was dropped and the group was kept for wording (decision 15). While עריכה is on, group chips stay locked (decision 22). Why: issue #26; a second tap undoing a pick is how the person chips already work.
 39. **Favourites (added 2026-11-15, extends 11, 15 and 34):** a "במועדפים" switch on the person page, under "הצגה במסלול", marks a favourite. On מי the name chips show favourites first and then everyone else, each part by name, also inside a chosen circle. Picking a chip never reorders them. A hidden favourite stays off the chips until picked (decision 15); hiding and favouriting are independent. The chips carry no star or marker. Orbit, כולם, the nudge, the sentence and הגדרות › חברים don't show favourites, and there's no cap. Why: issue #27; the user chose favourites first in the names over their own row, a built-in circle or the friends tab, and a person-page switch over a checkbox list in הגדרות.
 40. **Deleting from the name chips (added 2026-11-15, extends 22 and 26):** on מי › עריכה, ✕ on someone in no meetup and no group deletes them, as מחיקה does in הגדרות › חברים, and takes them out of every circle. It shows the toast "מחקת את {name}" with ביטול, which brings them back as they were, in the circles that still exist (if the same name was typed again before ביטול, both people stay, since that's rare within a toast); there is no confirm, like the other chip ✕s (decisions 22 and 30). Anyone else is hidden, as before. When editing a meetup, someone in its saved copy counts as in a meetup even after being unpicked. The ✕ is labelled "מחיקה: {name}" or "הסתרה: {name}" for VoiceOver. Why: issue #28; the ✕ only hid people who had nothing to keep.
+41. **Four ratings, טוב in teal (added 2026-11-17, clarifies 4):** the scale stays at four levels. טוב is teal instead of a lighter indigo, so it never reads as a paler מעולה, and in dark mode סביר is a darker grey, so teal and grey stay apart for colour-blind eyes (see Colours). The app icon keeps its `#6E7BEA` friend dot until #32 redoes the icon, an exception to decision 35's "only the app's colour tokens". Why: issue #31 said מעולה and טוב look alike and asked whether five levels would be better; both were the same indigo, told apart only by lightness. The user kept four over five: with no neutral middle every meetup leans good or bad, and a fifth colour would add a second pair that looks alike. On the decision page the user picked teal over gold טוב with brick לא משהו (the widest gap, but a harsher bad day) and sky טוב (still two blues, and מעולה stops being the brightest in dark mode).
+42. **Choosing light or dark (added 2026-11-17, extends assumption 2 and 16):** הגדרות has a מראה section above the version line, with a segmented control: אוטומטי · בהיר · כהה, the words iOS uses. It is the same pill as the באג / הצעה choice (decision 24), so הגדרות has one segmented look. אוטומטי is the default and follows the phone, live. בהיר and כהה hold whatever the phone does, on every screen, including the recovery screen, the sheets and the browser's status-bar colour. The choice is kept on this phone only: it isn't in the backup file, and an unknown stored value means אוטומטי. It applies before the first screen draws, so the app never flashes the other mode. Known limit: the iPhone keyboard belongs to iOS and keeps the phone's mode, so כהה on a light phone types on a light keyboard (and the other way round); אוטומטי never mixes them. Why: the user asked for a way to switch inside the app; one tap in a segment beats a sub-page for something set once, and keeping אוטומטי as the default leaves the phone in charge, as iOS apps usually do.
 
 ## Assumptions (accepted by the user)
 
 1. **Stack:** same as תפילות — React 19 + TypeScript + Vite, Ionic React in iOS mode, hash router, Dexie with persistent storage, `vite-plugin-pwa` (`registerType: 'prompt'`), valibot for the backup file, Vitest + Testing Library + fake-indexeddb, oxlint. Heebo self-hosted through `@fontsource/heebo`. Public GitHub repo on the personal account, GitHub Pages at `/social-log/`; repo creation and pushes only when the user asks.
-2. **Dark mode** follows the phone. Dark colours are derived from the light ones and contrast-checked (see Colours).
+2. **Dark mode** follows the phone, unless מראה in הגדרות says otherwise (decision 42). Dark colours are derived from the light ones and contrast-checked (see Colours).
 3. **Orbit rings:** inner = met within the last 7 days, middle = within 30 days, outer = longer. All circles are the same size. People never met are not shown.
 4. **Nudge** stays hidden until someone qualifies (decision 8).
 5. **Length chips:** חצי שעה, שעה, שעה וחצי, שעתיים, 3 שעות, 4 שעות, plus אחר (hours and minutes). Stored as minutes.
@@ -97,11 +99,11 @@ Personal iPhone PWA for logging meetups with friends: who, when, where, how long
 13. **Stats tiles:** meetups, how many were מעולה, and hours, over the 5 weeks shown.
 14. **Dates:** Gregorian only; no future dates; no reminders or notifications. A day rolls over at 03:00 like תפילות, so a meetup logged at 01:00 defaults to the previous evening's date.
 15. **Data:** `Person { id, name, hidden, favourite?, createdAt }` (decision 39), `Group { id, name, memberIds }`, `Meetup { id, date, personIds, groupId?, place, minutes, rating 1–4, activities?, initiator?, note?, createdAt }`, `SavedChoice { name, savedAt }` in `savedPlaces` and `savedActivities` (decision 29), `Circle { id, name, memberIds }` in `circles` (decision 34), always including the built-in משפחה circle with id `family` (decision 36). `circles` is optional in the backup file, and a file without it has only the built-in משפחה circle (decision 36). The saved lists are optional too; a file without them gets the chips its meetups showed, reading an older file's `hiddenPlaces` for that. `hiddenPlaces` is no longer exported. A backup is also refused if a saved place or activity has an empty name. People are never deleted, only hidden, except someone in no meetup and no group (decisions 19, 26 and 40). A meetup lasts a whole number of minutes from 1 to 1440; a backup with anything else is refused. The backup file is `version: 1`; new fields must be optional so old backups still import. No account, no server.
-16. **Settings:** a gear on the calendar opens הגדרות: backup export/import, saved groups, saved places and activities (decision 30), חברים (hide, show and delete people, decision 26), מעגלים (decision 34), and the version line with מה חדש.
+16. **Settings:** a gear on the calendar opens הגדרות: דיווח על באג / הצעה (decision 37), backup export/import, saved groups, saved places and activities (decision 30), חברים (hide, show and delete people, decision 26), מעגלים (decision 34), מראה (decision 42), and the version line with מה חדש.
 
 ## Colours
 
-Light (validated 2026-11-07 with the dataviz palette validator; contrast vs a white empty day):
+Light (validated 2026-11-07 with the dataviz palette validator, re-validated 2026-11-17 for good, decision 41; contrast vs a white empty day):
 
 | Token | Hex | Use | Contrast |
 |---|---|---|---|
@@ -110,21 +112,21 @@ Light (validated 2026-11-07 with the dataviz palette validator; contrast vs a wh
 | ink | `#141A33` | text, actions, selected tab, + button | |
 | muted | `#4A5270` | secondary text | 7.7:1 on white |
 | great | `#2B34C9` | מעולה, white text, 4 dots | 8.6:1 |
-| good | `#6E7BEA` | טוב, ink text, 3 dots | 3.7:1 (text 4.6:1) |
+| good | `#05A59E` | טוב, ink text, 3 dots | 3.05:1 (text 5.6:1) |
 | okay | `#6B7084` | סביר, white text, 2 dots | 4.9:1 |
 | meh | `#B3590B` | לא משהו, white text, 1 dot | 4.8:1 |
 
 Rules: indigo means only מעולה; actions use ink. A rating is never shown by colour alone (dots on days and buttons, text labels in lists).
 
-Dark (validated 2026-11-08 against surface `#1C2238`; colour-blind and normal-vision separation pass):
+Dark (validated 2026-11-08 against surface `#1C2238`, re-validated 2026-11-17 for good and okay, decision 41; colour-blind and normal-vision separation pass):
 
 | Token | Hex | Contrast |
 |---|---|---|
 | ground / surface / ink / muted | `#0F1324` / `#1C2238` / `#EEF1FA` / `#A9B0C8` | ink 13.9:1, muted 7.3:1 on surface |
 | sheet / sheet card | `#1C2238` / `#2A3152` | ink 11.2:1, muted 5.9:1 on sheet card (added 2026-11-10, decision 24) |
 | great | `#8C95FF`, dark text | 5.9:1 vs surface, text 6.9:1 |
-| good | `#5562DA`, white text | 3.1:1 vs surface, text 5.3:1 |
-| okay | `#7C8197`, dark text | 4.1:1 vs surface, text 4.8:1 |
+| good | `#00A99F`, dark text | 5.4:1 vs surface, text 6.3:1 |
+| okay | `#676C81`, white text | 3.02:1 vs surface, text 5.2:1 |
 | meh | `#E08A3C`, dark text | 5.9:1 vs surface, text 6.9:1 |
 
 In dark mode מעולה is the brightest rating rather than the darkest, so it still stands out most.

@@ -26,7 +26,7 @@
 
   --rating-4: #2b34c9;
   --rating-4-text: #ffffff;
-  --rating-3: #6e7bea;
+  --rating-3: #05a59e;
   --rating-3-text: #141a33;
   --rating-2: #6b7084;
   --rating-2-text: #ffffff;
@@ -40,48 +40,46 @@
   --status-bar-strip: 12px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root,
-  :root.ios {
-    --ion-color-primary: #eef1fa;
-    --ion-color-primary-rgb: 238, 241, 250;
-    --ion-color-primary-contrast: #0f1324;
-    --ion-color-primary-contrast-rgb: 15, 19, 36;
-    --ion-color-primary-shade: #d1d4dc;
-    --ion-color-primary-tint: #f0f2fb;
+:root.ion-palette-dark,
+:root.ion-palette-dark.ios {
+  --ion-color-primary: #eef1fa;
+  --ion-color-primary-rgb: 238, 241, 250;
+  --ion-color-primary-contrast: #0f1324;
+  --ion-color-primary-contrast-rgb: 15, 19, 36;
+  --ion-color-primary-shade: #d1d4dc;
+  --ion-color-primary-tint: #f0f2fb;
 
-    --ion-background-color: #0f1324;
-    --ion-background-color-rgb: 15, 19, 36;
-    --ion-item-background: #1c2238;
-    --ion-toolbar-background: #0f1324;
-    --ion-tab-bar-background: #0f1324;
+  --ion-background-color: #0f1324;
+  --ion-background-color-rgb: 15, 19, 36;
+  --ion-item-background: #1c2238;
+  --ion-toolbar-background: #0f1324;
+  --ion-tab-bar-background: #0f1324;
 
-    --app-ground: #0f1324;
-    --app-surface: #1c2238;
-    --app-ink: #eef1fa;
-    --app-on-ink: #0f1324;
-    --app-muted: #a9b0c8;
-    --app-ring: #343b57;
-    --app-outline: #7c8197;
-    --app-slot-active: #2a3152;
-    --app-separator: #2a3152;
+  --app-ground: #0f1324;
+  --app-surface: #1c2238;
+  --app-ink: #eef1fa;
+  --app-on-ink: #0f1324;
+  --app-muted: #a9b0c8;
+  --app-ring: #343b57;
+  --app-outline: #7c8197;
+  --app-slot-active: #2a3152;
+  --app-separator: #2a3152;
 
-    --rating-4: #8c95ff;
-    --rating-4-text: #0f1324;
-    --rating-3: #5562da;
-    --rating-3-text: #ffffff;
-    --rating-2: #7c8197;
-    --rating-2-text: #0f1324;
-    --rating-1: #e08a3c;
-    --rating-1-text: #0f1324;
-  }
+  --rating-4: #8c95ff;
+  --rating-4-text: #0f1324;
+  --rating-3: #00a99f;
+  --rating-3-text: #0f1324;
+  --rating-2: #676c81;
+  --rating-2-text: #ffffff;
+  --rating-1: #e08a3c;
+  --rating-1-text: #0f1324;
+}
 
-  :root.ios ion-modal {
-    --ion-background-color: #1c2238;
-    --ion-background-color-rgb: 28, 34, 56;
-    --ion-item-background: #2a3152;
-    --ion-toolbar-background: var(--ion-background-color);
-  }
+:root.ion-palette-dark.ios ion-modal {
+  --ion-background-color: #1c2238;
+  --ion-background-color-rgb: 28, 34, 56;
+  --ion-item-background: #2a3152;
+  --ion-toolbar-background: var(--ion-background-color);
 }
 
 .status-bar-strip {

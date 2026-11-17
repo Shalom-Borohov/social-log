@@ -28,7 +28,7 @@ CI (`.github/workflows/ci.yml`) runs lint, test and build on PRs. `deploy.yml` d
 
 ## Architecture
 
-Imports go downward only: `pages` → `data` / `domain` → `copy`. `Tabs`, `pages/settings` and `recovery` also import `appUpdate`.
+Imports go downward only: `pages` → `data` / `domain` → `copy`. `Tabs`, `pages/settings` and `recovery` also import `appUpdate`. `main.tsx` and `pages/settings` also import `appearance`, which keeps the light/dark choice (decision 42) and puts `ion-palette-dark` on `<html>`.
 
 - **`src/domain/`**: pure functions over people, groups and meetups, with no React and no Dexie. Types live in `types.ts`.
 - **`src/domain/logicalDay.ts`**: dates are `'YYYY-MM-DD'` strings everywhere; convert only through `parseIsoDate` / `toIsoDate` (noon-pinned). A day rolls over at 03:00.
