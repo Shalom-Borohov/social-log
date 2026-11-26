@@ -80,6 +80,19 @@ describe('splitting several people typed together', () => {
     expect(await pressed('דני')).toBe('true')
     expect(await peopleNames()).toEqual(['דני', 'תמר'])
   })
+
+  it('keeps ורד whole after a comma on פיצול ל־2', async () => {
+    renderAt('/log')
+
+    await addAndAsk('שם חדש', 'דני, ורד')
+
+    expect(alertMessage()).toBe('דני · ורד')
+
+    clickAlertButton('פיצול ל־2')
+
+    await waitFor(async () => expect(await pressed('ורד')).toBe('true'))
+    expect(await peopleNames()).toEqual(['דני', 'ורד', 'תמר'])
+  })
 })
 
 describe('splitting several places saved together', () => {
