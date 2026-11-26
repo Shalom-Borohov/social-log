@@ -19,6 +19,7 @@ import {
 import { chatbubbleEllipsesOutline } from 'ionicons/icons'
 import { useState } from 'react'
 import { COMMON_COPY } from '../../copy/common'
+import { useModalDialogLabel } from '../../hooks/useModalDialogLabel'
 import { SETTINGS_COPY } from './copy'
 import { type FeedbackKind, feedbackLink } from './feedbackUrl'
 import './feedback.css'
@@ -92,6 +93,7 @@ function FeedbackForm({ onClose }: { onClose: () => void }) {
 
 export function FeedbackSettings() {
   const [open, setOpen] = useState(false)
+  const dialogLabel = useModalDialogLabel(SETTINGS_COPY.report)
 
   return (
     <>
@@ -101,7 +103,7 @@ export function FeedbackSettings() {
           <IonLabel>{SETTINGS_COPY.reportBugOrIdea}</IonLabel>
         </IonItem>
       </IonList>
-      <IonModal isOpen={open} onDidDismiss={() => setOpen(false)}>
+      <IonModal isOpen={open} onDidDismiss={() => setOpen(false)} htmlAttributes={dialogLabel}>
         <FeedbackForm onClose={() => setOpen(false)} />
       </IonModal>
     </>

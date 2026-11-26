@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { saveSeenVersion } from '../../src/appUpdate/seenVersion'
 import { resetDb } from '../helpers/db'
 import { expectInOrder } from '../helpers/ionic'
+import { modalName } from '../helpers/overlays'
 import { renderAt } from '../helpers/renderAt'
 
 vi.mock('../../src/appUpdate/changelog', () => ({
@@ -67,6 +68,16 @@ describe('what’s new after an update', () => {
     expect(screen.getByText('הכי ישן')).toBeInTheDocument()
     expect(screen.getByText('ישן')).toBeInTheDocument()
     expect(screen.getByText('פס עדכון')).toBeInTheDocument()
+  })
+
+  it('names the sheet מה חדש for VoiceOver', async () => {
+    saveSeenVersion(OLDEST_SEEN)
+    renderAt('/tabs/calendar')
+
+    const change = await screen.findByText('פס עדכון')
+
+    await waitFor(() => expect(modalName(change)).toBe('מה חדש'))
+    expect(change.closest('ion-modal')).not.toHaveAttribute('aria-label')
   })
 })
 

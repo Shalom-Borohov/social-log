@@ -7,6 +7,11 @@ export const CHANGELOG: Release[] = [
     fixes: [],
   },
   {
+    version: '1.10.4',
+    features: [],
+    fixes: ['VoiceOver מקריא את השם של מה חדש ושל חלון הדיווח כשהם נפתחים'],
+  },
+  {
     version: '1.10.3',
     features: [],
     fixes: [
