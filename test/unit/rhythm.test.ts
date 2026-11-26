@@ -15,6 +15,10 @@ describe('usualGap', () => {
     expect(usualGap(['2026-10-01', '2026-10-08', '2026-10-22', '2026-10-25'])).toBe(7)
   })
 
+  it('is a half day when the middle two gaps differ by one', () => {
+    expect(usualGap(['2026-10-01', '2026-10-04', '2026-10-08'])).toBe(3.5)
+  })
+
   it('counts every meetup towards the three, even two on the same day', () => {
     expect(usualGap(['2026-10-01', '2026-10-01', '2026-10-11'])).toBe(10)
   })
@@ -41,6 +45,39 @@ describe('mostOverdue', () => {
     const meetups = meetupsWith('noam', ['2026-10-25', '2026-11-01', '2026-11-05'])
 
     expect(mostOverdue([noam], meetups, TODAY)).toBeNull()
+  })
+
+  it('names someone once the days since pass a half-day usual gap', () => {
+    const tamar = aPerson({ id: 'tamar' })
+    const meetups = meetupsWith('tamar', ['2026-10-01', '2026-10-04', '2026-10-08'])
+
+    expect(mostOverdue([tamar], meetups, '2026-10-12')).toEqual({ person: tamar, daysSince: 4 })
+  })
+
+  it('ranks by the half-day usual gap, not a rounded one', () => {
+    const tamar = aPerson({ id: 'tamar', name: 'תמר' })
+    const noam = aPerson({ id: 'noam', name: 'נועם' })
+
+    const meetups = [
+      ...meetupsWith('tamar', ['2026-10-27', '2026-10-30', '2026-11-03']),
+      ...meetupsWith('noam', ['2026-10-19', '2026-10-25', '2026-10-31']),
+    ]
+
+    expect(mostOverdue([tamar, noam], meetups, TODAY)).toEqual({ person: tamar, daysSince: 5 })
+  })
+
+  it('names nobody seen exactly their usual gap ago', () => {
+    const noam = aPerson({ id: 'noam' })
+    const meetups = meetupsWith('noam', ['2026-10-18', '2026-10-25', '2026-11-01'])
+
+    expect(mostOverdue([noam], meetups, TODAY)).toBeNull()
+  })
+
+  it('names someone one day past their usual gap', () => {
+    const noam = aPerson({ id: 'noam' })
+    const meetups = meetupsWith('noam', ['2026-10-17', '2026-10-24', '2026-10-31'])
+
+    expect(mostOverdue([noam], meetups, TODAY)).toEqual({ person: noam, daysSince: 8 })
   })
 
   it('skips hidden people', () => {
