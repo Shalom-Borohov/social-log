@@ -2,6 +2,14 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.10.3',
+    features: [],
+    fixes: [
+      'ייצוא גיבוי בודק גם מפגשים עם חבר שכבר לא קיים',
+      'ייצוא גיבוי עם רשומה פגומה כבר לא נספר כגיבוי, והתזכורת נשארת',
+    ],
+  },
+  {
     version: '1.10.2',
     features: [],
     fixes: ['שם שמתחיל ב־ו אחרי פסיק, כמו ורד, נשאר שלם בפיצול'],

@@ -4,6 +4,7 @@ import { addMeetup, addPerson, allGroups, allMeetups, allPeople, saveGroup, setP
 import { allCircles, joinCircle, saveCircle } from '../../src/data/circles'
 import { allSavedChoices, saveChoices } from '../../src/data/savedChoices'
 import { inSavedOrder } from '../../src/domain/choices'
+import { db } from '../../src/data/db'
 import { resetDb } from '../helpers/db'
 import { ACTIVITY_PRESETS, names } from '../helpers/meetups'
 
@@ -29,6 +30,22 @@ async function logAWalk() {
 
 describe('backup', () => {
   beforeEach(resetDb)
+
+  it('exports a meetup with no date, in date order, and counts it as bad', async () => {
+    const later = { id: 'later', date: '2026-11-07', personIds: ['p'], place: 'בבית', minutes: 60, rating: 2, createdAt: 1 }
+    const earlier = { ...later, id: 'earlier', date: '2026-11-01' }
+    const dateless = JSON.parse('{"id":"dateless","personIds":["p"],"place":"בבית","minutes":60,"rating":2,"createdAt":1}')
+
+    await db.people.put({ id: 'p', name: 'תמר', hidden: false, createdAt: 1 })
+    await db.meetups.bulkPut([later, dateless, earlier])
+
+    const fileText = JSON.stringify(await exportBackup(exportedAt))
+    const exportedIds = JSON.parse(fileText).meetups.map(({ id }: { id: string }) => id)
+
+    expect(exportedIds.filter((id: string) => id !== 'dateless')).toEqual(['earlier', 'later'])
+    expect(exportedIds).toContain('dateless')
+    expect(countBadRecords(fileText)).toBe(1)
+  })
 
   it('round-trips people, groups and meetups', async () => {
     await logAWalk()
@@ -174,5 +191,42 @@ describe('backup', () => {
     }
 
     expect(countBadRecords(JSON.stringify(file))).toBe(3)
+  })
+
+  it('counts a meetup with someone not in the file', () => {
+    const meetup = { id: 'm', date: '2026-11-07', personIds: ['stranger'], place: 'בבית', minutes: 60, rating: 2, createdAt: 1 }
+    const people = [{ id: 'p', name: 'תמר', hidden: false, createdAt: 1 }]
+
+    expect(countBadRecords(JSON.stringify({ version: 1, exportedAt, people, groups: [], meetups: [meetup] }))).toBe(1)
+  })
+
+  it('counts a broken meetup with someone not in the file once', () => {
+    const meetup = { id: 'm', date: '2026-11-07', personIds: ['stranger'], place: '', minutes: 60, rating: 2, createdAt: 1 }
+
+    expect(countBadRecords(JSON.stringify({ version: 1, exportedAt, people: [], groups: [], meetups: [meetup] }))).toBe(1)
+  })
+
+  it.each([
+    ['only sound records', {}, {}, false],
+    ['a meetup with someone not in the file', { personIds: ['stranger'] }, {}, true],
+    ['a broken meetup', { rating: 9 }, {}, true],
+    ['a broken person', {}, { name: undefined }, true],
+  ])('flags a file with %s exactly when the import refuses it', (_case, meetupChange, personChange, refused) => {
+    const meetup = { id: 'm', date: '2026-11-07', personIds: ['p'], place: 'בבית', minutes: 60, rating: 2, createdAt: 1, ...meetupChange }
+    const person = { id: 'p', name: 'תמר', hidden: false, createdAt: 1, ...personChange }
+    const fileText = JSON.stringify({ version: 1, exportedAt, people: [person], groups: [], meetups: [meetup] })
+
+    const importRefuses = () => {
+      try {
+        parseBackup(fileText)
+
+        return false
+      } catch {
+        return true
+      }
+    }
+
+    expect(importRefuses()).toBe(refused)
+    expect(countBadRecords(fileText) > 0).toBe(refused)
   })
 })

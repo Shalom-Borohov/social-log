@@ -1,10 +1,11 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { App } from '../../src/App'
 import { db } from '../../src/data/db'
+import { readLastBackup } from '../../src/backup/lastBackup'
 import { stubShare } from '../helpers/backupFile'
 import { resetDb } from '../helpers/db'
-import { aMeetup } from '../helpers/meetups'
+import { aMeetup, aPerson } from '../helpers/meetups'
 import { missingPeople, openRecoveryScreen, prepareRecoveryScreen } from '../helpers/recovery'
 
 const RECOVERY_HEADING = 'משהו השתבש'
@@ -20,7 +21,11 @@ async function sharedFileText(share: ReturnType<typeof stubShare>) {
   return file.text()
 }
 
-const openOnStoredRecords = () => openRecoveryScreen([goodDay])
+async function openOnStoredRecords() {
+  await db.people.put(aPerson({ id: 'noam' }))
+
+  return openRecoveryScreen([goodDay])
+}
 
 describe('a malformed stored record', () => {
   prepareRecoveryScreen()
@@ -59,17 +64,14 @@ describe('a malformed stored record', () => {
     expect(await screen.findByText('הפעולה נכשלה')).toBeVisible()
   })
 
-  it('does not report a shared file as failed when the backup time cannot be stored', async () => {
+  it('does not count the file with the bad record as a backup', async () => {
     stubShare(() => Promise.resolve())
 
     await openOnStoredRecords()
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new Error('Storage is full')
-    })
     fireEvent.click(screen.getByRole('button', { name: EXPORT_BUTTON }))
 
     expect(await screen.findByText('בגיבוי יש רשומה פגומה אחת, וייבוא הקובץ ייכשל')).toBeVisible()
-    expect(screen.queryByText('הפעולה נכשלה')).not.toBeInTheDocument()
+    expect(readLastBackup()).toBeNull()
   })
 
   it('never changes what is stored', async () => {
