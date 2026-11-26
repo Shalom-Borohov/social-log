@@ -64,6 +64,16 @@ export const typeInAlert = (value: string) => fireEvent.input(last('ion-alert in
 
 export const clickAlertButton = (text: string) => fireEvent.click(buttonIn('ion-alert', '.alert-button', text))
 
+export function modalName(content: Element) {
+  const dialog = content.closest('ion-modal')?.shadowRoot?.querySelector('[role="dialog"]')
+
+  if (!dialog) {
+    throw new Error('no modal dialog')
+  }
+
+  return dialog.getAttribute('aria-label')
+}
+
 export const toasts = () => Array.from(document.querySelectorAll('ion-toast'), (toast) => toast.message)
 
 export function clickToastButton(text: string) {

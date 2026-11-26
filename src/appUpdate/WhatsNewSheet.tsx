@@ -13,6 +13,7 @@ import {
 } from '@ionic/react'
 import { Fragment } from 'react'
 import { COMMON_COPY } from '../copy/common'
+import { useModalDialogLabel } from '../hooks/useModalDialogLabel'
 import { APP_UPDATE_COPY } from './copy'
 import type { Release } from './releases'
 import './appUpdate.css'
@@ -45,8 +46,10 @@ function ChangeList({ title, changes }: { title: string; changes: string[] }) {
 }
 
 export function WhatsNewSheet({ isOpen, releases, onClose }: WhatsNewSheetProps) {
+  const dialogLabel = useModalDialogLabel(APP_UPDATE_COPY.whatsNew)
+
   return (
-    <IonModal isOpen={isOpen} onDidDismiss={onClose} {...HALF_SHEET}>
+    <IonModal isOpen={isOpen} onDidDismiss={onClose} htmlAttributes={dialogLabel} {...HALF_SHEET}>
       <IonHeader>
         <IonToolbar>
           <IonTitle>{APP_UPDATE_COPY.whatsNew}</IonTitle>
