@@ -1,4 +1,5 @@
 import { COMMON_COPY } from '../copy/common'
+import { meetupPlaces, storedPlaces } from '../domain/places'
 import type { ChoiceKind, SavedChoice } from '../domain/types'
 import { db } from './db'
 
@@ -33,7 +34,19 @@ export async function restoreChoice(kind: ChoiceKind, choice: SavedChoice) {
 
 function renameInMeetups(kind: ChoiceKind, from: string, to: string) {
   if (kind === 'place') {
-    return db.meetups.filter(({ place }) => place === from).modify({ place: to })
+    return db.meetups
+      .filter((meetup) => meetupPlaces(meetup).includes(from))
+      .modify((meetup) => {
+        const [first, ...later] = meetupPlaces(meetup).map((place) => (place === from ? to : place))
+        const renamed = storedPlaces(first, later)
+
+        meetup.place = renamed.place
+        meetup.laterPlaces = renamed.laterPlaces
+
+        if (!renamed.laterPlaces) {
+          delete meetup.laterPlaces
+        }
+      })
   }
 
   return db.meetups

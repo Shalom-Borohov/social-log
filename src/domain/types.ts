@@ -34,6 +34,7 @@ export interface Meetup {
   personIds: string[]
   groupId?: string
   place: string
+  laterPlaces?: string[]
   minutes: number
   rating: Rating
   activities?: string[]

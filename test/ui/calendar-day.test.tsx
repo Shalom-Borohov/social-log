@@ -73,14 +73,14 @@ describe('a day on the calendar', () => {
       people,
       meetups: [
         aMeetup({ date: '2026-11-05', personIds: ['noam'], place: 'בפלורנטין' }),
-        aMeetup({ date: '2026-10-20', personIds: ['tamar'], place: 'בים', minutes: 240, rating: 1 }),
+        aMeetup({ date: '2026-10-20', personIds: ['tamar'], place: 'בים', laterPlaces: ['בבית'], minutes: 240, rating: 1 }),
       ],
     })
     await openCalendar()
 
     fireEvent.click(await dayButton('יום שלישי 20.10'))
 
-    expect(await screen.findByText('בים · 4 שעות')).toBeInTheDocument()
+    expect(await screen.findByText('בים ובבית · 4 שעות')).toBeInTheDocument()
     expect(screen.getByText('לא משהו', { selector: '.rating-tag' })).toBeInTheDocument()
     expect(screen.queryByText(/בפלורנטין/)).not.toBeInTheDocument()
     expect(await dayButton('יום שלישי 20.10')).toHaveAttribute('aria-pressed', 'true')

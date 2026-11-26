@@ -2,6 +2,11 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.11.0',
+    features: ['אפשר לרשום כמה מקומות במפגש אחד, למשל אם עברתם ממקום למקום'],
+    fixes: [],
+  },
+  {
     version: '1.10.4',
     features: [],
     fixes: ['VoiceOver מקריא את השם של מה חדש ושל חלון הדיווח כשהם נפתחים'],

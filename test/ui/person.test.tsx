@@ -33,7 +33,14 @@ const middle = aMeetup({
   initiator: 'them',
 })
 
-const earliest = aMeetup({ id: 'earliest', date: '2026-09-30', personIds: ['tamar'], place: 'בקפה', rating: 3 })
+const earliest = aMeetup({
+  id: 'earliest',
+  date: '2026-09-30',
+  personIds: ['tamar'],
+  place: 'בקפה',
+  laterPlaces: ['בפארק'],
+  rating: 3,
+})
 
 const noamAlone = aMeetup({ id: 'noam-alone', date: '2026-11-01', personIds: ['noam'], place: 'בים' })
 
@@ -107,7 +114,7 @@ describe('a person’s page', () => {
   it('lists the meetups with them, newest first, with who came, where and how it was', async () => {
     renderAt(TAMAR_PAGE)
 
-    await expectInOrder(['תמר ונועם · בטיילת', 'תמר · בבית', 'תמר · בקפה'])
+    await expectInOrder(['תמר ונועם · בטיילת', 'תמר · בבית', 'תמר · בקפה ובפארק'])
     expect(rowOf('תמר ונועם · בטיילת')).toHaveTextContent('מעולה')
     expect(rowOf('תמר · בבית')).toHaveTextContent('לא משהו')
     expect(rowOf('תמר · בבית')).toHaveTextContent('שבת 10.10')

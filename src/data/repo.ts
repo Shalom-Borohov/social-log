@@ -1,17 +1,18 @@
 import { COMMON_COPY } from '../copy/common'
 import { isUnused } from '../domain/person'
+import { storedPlaces } from '../domain/places'
 import type { Group, Meetup, MeetupDraft, Person } from '../domain/types'
 import { db } from './db'
 
 export const newId = () => crypto.randomUUID()
 
-export function cleanDraft({ activities, initiator, note, groupId, ...required }: MeetupDraft): MeetupDraft {
+export function cleanDraft({ activities, initiator, note, groupId, place, laterPlaces, ...required }: MeetupDraft): MeetupDraft {
   const trimmedNote = note?.trim()
   const trimmedActivities = activities?.map((activity) => activity.trim()).filter(Boolean)
 
   return {
     ...required,
-    place: required.place.trim(),
+    ...storedPlaces(place, laterPlaces),
     ...(groupId ? { groupId } : {}),
     ...(trimmedActivities?.length ? { activities: trimmedActivities } : {}),
     ...(initiator ? { initiator } : {}),

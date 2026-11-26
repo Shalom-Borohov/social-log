@@ -21,7 +21,7 @@ const recentWithNoam = aMeetup({ date: '2026-11-05', personIds: ['noam', 'dana']
 const tamarEveryMonth = [
   aMeetup({ date: '2026-05-10', personIds: ['tamar'], place: 'בפארק' }),
   aMeetup({ date: '2026-06-09', personIds: ['tamar'], place: 'בבית' }),
-  aMeetup({ date: '2026-07-09', personIds: ['tamar'], place: 'בטיילת' }),
+  aMeetup({ date: '2026-07-09', personIds: ['tamar'], place: 'בטיילת', laterPlaces: ['בים'] }),
 ]
 
 const storeEveryone = () =>
@@ -76,7 +76,7 @@ describe('the friends orbit', () => {
     renderAt(FRIENDS)
 
     expect(await screen.findByText('לא ראית את תמר 4 חודשים')).toBeInTheDocument()
-    expect(screen.getByText('פעם אחרונה: בטיילת, יום חמישי 9.7')).toBeInTheDocument()
+    expect(screen.getByText('פעם אחרונה: בטיילת ובים, יום חמישי 9.7')).toBeInTheDocument()
   })
 
   it('rings the overdue friend’s circle', async () => {

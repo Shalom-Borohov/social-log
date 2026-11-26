@@ -1,6 +1,7 @@
 import { IonLabel, IonList, IonListHeader } from '@ionic/react'
 import { MeetupRow } from '../../components/MeetupRow'
 import { dayLabel, LIST_SEPARATOR } from '../../domain/format'
+import { meetupPlacesLabel } from '../../domain/places'
 import { peopleLabel } from '../../domain/sentence'
 import type { Group, Meetup, Person } from '../../domain/types'
 import { FRIENDS_COPY } from './copy'
@@ -27,7 +28,9 @@ export function MeetupHistory({ history, people, groups }: MeetupHistoryProps) {
             key={meetup.id}
             meetup={meetup}
             title={dayLabel(meetup.date)}
-            details={[peopleLabel(meetup.personIds, people, groups, meetup.groupId), meetup.place].join(LIST_SEPARATOR)}
+            details={[peopleLabel(meetup.personIds, people, groups, meetup.groupId), meetupPlacesLabel(meetup)].join(
+              LIST_SEPARATOR,
+            )}
           />
         ))}
       </IonList>

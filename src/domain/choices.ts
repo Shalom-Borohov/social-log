@@ -1,5 +1,6 @@
 import { MEETUP_COPY } from '../copy/meetup'
 import { newestFirst } from './person'
+import { meetupPlaces } from './places'
 import { ownActivities, recentPlaces } from './recentChoices'
 import type { ChoiceKind, Meetup, SavedChoice } from './types'
 
@@ -17,7 +18,7 @@ export function initialSavedLists(meetups: Meetup[], hiddenPlaces: string[]) {
 export const inSavedOrder = (saved: SavedChoice[]) => [...saved].sort((first, second) => first.savedAt - second.savedAt)
 
 export function placesByLastUse(saved: SavedChoice[], meetups: Meetup[]): SavedChoice[] {
-  const lastUsed = [...new Set(newestFirst(meetups).map(({ place }) => place))]
+  const lastUsed = [...new Set(newestFirst(meetups).flatMap(meetupPlaces))]
   const used = saved.filter(({ name }) => lastUsed.includes(name))
   const unused = inSavedOrder(saved.filter(({ name }) => !lastUsed.includes(name))).reverse()
 

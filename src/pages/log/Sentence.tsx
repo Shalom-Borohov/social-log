@@ -1,9 +1,10 @@
 import { MEETUP_COPY } from '../../copy/meetup'
 import { LIST_SEPARATOR } from '../../domain/format'
+import { placesLabel } from '../../domain/places'
 import { dateWord, durationLabel, peopleLabel } from '../../domain/sentence'
 import type { Group, Person } from '../../domain/types'
 import { LOG_COPY } from './copy'
-import type { DraftFields, Slot, Step } from './meetupDraft'
+import { type DraftFields, draftPlaces, type Slot, type Step } from './meetupDraft'
 
 interface SentenceProps {
   draft: DraftFields
@@ -38,12 +39,12 @@ function SlotButton({ slot, text, step, onOpen }: SlotButtonProps) {
 }
 
 function slotTexts({ draft, today, people, groups }: SentenceProps): Record<Slot, string | null> {
-  const place = draft.place.trim()
+  const places = draftPlaces(draft)
 
   return {
     date: dateWord(draft.date, today),
     people: draft.personIds.length > 0 ? peopleLabel(draft.personIds, people, groups, draft.groupId) : null,
-    place: place === '' ? null : place,
+    place: places.length > 0 ? placesLabel(places) : null,
     duration: draft.minutes === undefined ? null : durationLabel(draft.minutes),
     rating: draft.rating === undefined ? null : MEETUP_COPY.ratings[draft.rating],
   }

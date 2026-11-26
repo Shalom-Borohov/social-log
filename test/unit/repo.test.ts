@@ -84,6 +84,22 @@ describe('repo', () => {
     expect(stored).toEqual({ ...walk, id: expect.any(String), createdAt: expect.any(Number) })
   })
 
+  it('adds a meetup with later places trimmed, each listed once', async () => {
+    await addMeetup({ ...walk, place: 'בטיילת', laterPlaces: [' בים ', 'בטיילת', ''] })
+
+    const [stored] = await allMeetups()
+
+    expect(stored).toEqual(expect.objectContaining({ place: 'בטיילת', laterPlaces: ['בים'] }))
+  })
+
+  it('drops the later places when none is left', async () => {
+    await addMeetup({ ...walk, place: 'בטיילת', laterPlaces: [' '] })
+
+    const [stored] = await allMeetups()
+
+    expect(stored).not.toHaveProperty('laterPlaces')
+  })
+
   it('edits and deletes a meetup', async () => {
     const id = await addMeetup(walk)
 

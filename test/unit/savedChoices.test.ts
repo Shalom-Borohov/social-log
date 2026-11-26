@@ -64,6 +64,22 @@ describe('saved places and activities', () => {
     )
   })
 
+  it('renames a later place in past meetups without listing it twice', async () => {
+    await saveChoices('place', ['בטילת'])
+    await db.meetups.bulkPut([
+      aMeetup({ id: 'evening', place: 'בים', laterPlaces: ['בטילת', 'בבית'] }),
+      aMeetup({ id: 'twice', place: 'בטיילת', laterPlaces: ['בטילת'] }),
+    ])
+
+    await renameChoice('place', 'בטילת', 'בטיילת')
+
+    expect(await db.meetups.get('evening')).toEqual(
+      expect.objectContaining({ place: 'בים', laterPlaces: ['בטיילת', 'בבית'] }),
+    )
+    expect(await db.meetups.get('twice')).toEqual(expect.objectContaining({ place: 'בטיילת' }))
+    expect((await db.meetups.get('twice'))?.laterPlaces).toBeUndefined()
+  })
+
   it('renames an activity in past meetups without listing it twice', async () => {
     await saveChoices('activity', ['שש-בש'])
     await db.meetups.put(aMeetup({ id: 'game', activities: ['שש בש', 'שש-בש', 'קפה'] }))

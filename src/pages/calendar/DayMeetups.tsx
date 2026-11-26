@@ -1,5 +1,6 @@
 import { IonList } from '@ionic/react'
 import { MeetupRow } from '../../components/MeetupRow'
+import { meetupPlacesLabel } from '../../domain/places'
 import { durationLabel, peopleLabel } from '../../domain/sentence'
 import type { Group, Meetup, Person } from '../../domain/types'
 import { CALENDAR_COPY } from './copy'
@@ -22,7 +23,7 @@ export function DayMeetups({ meetups, people, groups }: DayMeetupsProps) {
           key={meetup.id}
           meetup={meetup}
           title={peopleLabel(meetup.personIds, people, groups, meetup.groupId)}
-          details={CALENDAR_COPY.meetupDetails(meetup.place, durationLabel(meetup.minutes))}
+          details={CALENDAR_COPY.meetupDetails(meetupPlacesLabel(meetup), durationLabel(meetup.minutes))}
         />
       ))}
     </IonList>
