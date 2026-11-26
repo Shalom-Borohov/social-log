@@ -2,6 +2,11 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
+    version: '1.10.1',
+    features: [],
+    fixes: ['שם שמתחיל ב־ו אחרי פסיק, כמו ורד, נשאר שלם בפיצול'],
+  },
+  {
     version: '1.10.0',
     features: ['בהגדרות › מראה בוחרים בהיר, כהה או אוטומטי לפי הטלפון'],
     fixes: ['טוב בצבע טורקיז, כדי שלא ייראה כמו מעולה'],
