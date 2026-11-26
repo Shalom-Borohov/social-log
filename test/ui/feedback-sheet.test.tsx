@@ -2,6 +2,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { resetDb } from '../helpers/db'
 import { ionField, ionInput } from '../helpers/ionic'
+import { modalName } from '../helpers/overlays'
 import { renderAt } from '../helpers/renderAt'
 
 const REPORT = 'המפגש לא נשמר'
@@ -102,5 +103,15 @@ describe('the report sheet', () => {
 
     expect(await descriptionField()).toHaveValue('')
     expect(await screen.findByText('ביטול')).toBeInTheDocument()
+  })
+
+  it('names the sheet דיווח for VoiceOver', async () => {
+    renderAt('/tabs/calendar/settings')
+    fireEvent.click(await screen.findByText('דיווח על באג / הצעה'))
+
+    const field = await descriptionField()
+
+    await waitFor(() => expect(modalName(field)).toBe('דיווח'))
+    expect(field.closest('ion-modal')).not.toHaveAttribute('aria-label')
   })
 })
