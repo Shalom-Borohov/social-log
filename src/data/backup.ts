@@ -65,6 +65,7 @@ const meetupSchema = object({
   personIds: pipe(array(string()), minLength(1)),
   groupId: optional(string()),
   place: pipe(string(), minLength(1)),
+  laterPlaces: optional(array(pipe(string(), minLength(1)))),
   minutes: pipe(number(), integer(), minValue(1), maxValue(MINUTES_PER_DAY)),
   rating: picklist(RATINGS),
   activities: optional(array(string())),

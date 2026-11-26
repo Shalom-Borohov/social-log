@@ -65,11 +65,10 @@ export function MeetupForm({
     ),
     place: () => (
       <PlacePanel
-        place={draft.place}
+        fields={draft}
         savedPlaces={placesByLastUse(savedPlaces, meetups)}
-        onChange={(place) => update({ place })}
-        onPick={(place) => fill({ place })}
-        onNext={() => fill()}
+        onChange={update}
+        onMoveOn={fill}
       />
     ),
     duration: () => <DurationPanel minutes={draft.minutes} onPick={(minutes) => fill({ minutes })} />,

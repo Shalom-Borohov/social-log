@@ -1,4 +1,5 @@
 import { dayLabel } from '../../domain/format'
+import { meetupPlacesLabel } from '../../domain/places'
 import type { Meetup, Person } from '../../domain/types'
 import { FRIENDS_COPY } from './copy'
 import { sinceLabel } from './sinceLabel'
@@ -14,7 +15,7 @@ export function NudgeCard({ person, daysSince, lastMeetup, onOpen }: NudgeCardPr
   return (
     <button type="button" className="nudge-card" onClick={() => onOpen(person.id)}>
       <span className="nudge-title">{FRIENDS_COPY.notSeenSince(person.name, sinceLabel(daysSince))}</span>
-      <span className="nudge-detail">{FRIENDS_COPY.lastTime(lastMeetup.place, dayLabel(lastMeetup.date))}</span>
+      <span className="nudge-detail">{FRIENDS_COPY.lastTime(meetupPlacesLabel(lastMeetup), dayLabel(lastMeetup.date))}</span>
     </button>
   )
 }

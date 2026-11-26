@@ -13,20 +13,24 @@ export const DURATION_PRESETS = [30, 60, 90, 120, 180, 240] as const
 
 export const RECENT_DAY_WORDS = [MEETUP_COPY.today, MEETUP_COPY.yesterday, MEETUP_COPY.dayBeforeYesterday]
 
-function joinNames(names: string[]): string {
-  if (names.length <= 1) {
-    return names.join('')
+export function fullList(items: string[]): string {
+  if (items.length <= 1) {
+    return items.join('')
   }
 
+  const leading = items.slice(0, -1).join(MEETUP_COPY.listSeparator)
+
+  return `${leading} ${MEETUP_COPY.and(items[items.length - 1])}`
+}
+
+function joinNames(names: string[]): string {
   if (names.length > FULL_LIST_LIMIT) {
     const shown = names.slice(0, SHORT_LIST_NAMES).join(MEETUP_COPY.listSeparator)
 
     return `${shown} ${MEETUP_COPY.andMore(names.length - SHORT_LIST_NAMES)}`
   }
 
-  const leading = names.slice(0, -1).join(MEETUP_COPY.listSeparator)
-
-  return `${leading} ${MEETUP_COPY.and(names[names.length - 1])}`
+  return fullList(names)
 }
 
 export const samePeople = (personIds: string[], otherIds: string[]) =>

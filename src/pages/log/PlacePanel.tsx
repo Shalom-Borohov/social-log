@@ -2,39 +2,48 @@ import type { FormEvent } from 'react'
 import { saveChoices } from '../../data/savedChoices'
 import { splitParts } from '../../domain/split'
 import type { SavedChoice } from '../../domain/types'
-import { useRemoveChoice } from '../../hooks/useRemoveWithUndo'
 import { useSave } from '../../hooks/useSave'
 import { LOG_COPY } from './copy'
-import { Chip, ChipGroup, EditToggle, MainAction, Panel, RemoveChip, SaveForNextTime } from './Panel'
-import { useChipEditing } from './useChipEditing'
+import { type DraftFields, toggledIn } from './meetupDraft'
+import { MainAction, Panel, SaveForNextTime } from './Panel'
+import { PlaceChips } from './PlaceChips'
 import { useSplitPrompt } from './useSplitPrompt'
 
+type PlaceFields = Pick<DraftFields, 'places' | 'placeText'>
+
 interface PlacePanelProps {
-  place: string
+  fields: PlaceFields
   savedPlaces: SavedChoice[]
-  onChange: (place: string) => void
-  onPick: (place: string) => void
-  onNext: () => void
+  onChange: (changes: Partial<PlaceFields>) => void
+  onMoveOn: (changes: Partial<PlaceFields>) => void
 }
 
-export function PlacePanel({ place, savedPlaces, onChange, onPick, onNext }: PlacePanelProps) {
-  const typed = place.trim()
-  const empty = typed === ''
-  const { editing, toggleEditing } = useChipEditing()
-  const remove = useRemoveChoice('place')
+export function PlacePanel({ fields, savedPlaces, onChange, onMoveOn }: PlacePanelProps) {
+  const { places, placeText } = fields
+  const typed = placeText.trim()
+  const noPlaceYet = places.length === 0
   const askSplit = useSplitPrompt()
   const save = useSave()
   const savedNames = savedPlaces.map(({ name }) => name)
   const alreadySaved = savedNames.includes(typed) || splitParts(typed).every((part) => savedNames.includes(part))
-  const unsaved = !empty && !alreadySaved
+  const unsaved = typed !== '' && !alreadySaved
+
+  function addTyped(moveOn: boolean) {
+    const add = (names: string[]) =>
+      (moveOn ? onMoveOn : onChange)({ places: [...new Set([...places, ...names])], placeText: '' })
+
+    askSplit({ text: typed, header: LOG_COPY.splitAddHeader, onParts: add, onWhole: (text) => add([text]) })
+  }
 
   function submit(event: FormEvent) {
     event.preventDefault()
-
-    if (!empty) {
-      onNext()
-    }
+    addTyped(noPlaceYet)
   }
+
+  const next = () => (typed === '' ? onMoveOn({}) : addTyped(true))
+
+  const tapChip = (place: string) =>
+    noPlaceYet ? onMoveOn({ places: [place], placeText: '' }) : onChange({ places: toggledIn(places, place) })
 
   const saveTyped = () =>
     askSplit({
@@ -47,42 +56,19 @@ export function PlacePanel({ place, savedPlaces, onChange, onPick, onNext }: Pla
   return (
     <Panel
       heading={LOG_COPY.panelHeadings.place}
-      action={<MainAction label={LOG_COPY.next} disabled={empty} onClick={onNext} />}
+      action={<MainAction label={LOG_COPY.next} disabled={noPlaceYet && typed === ''} onClick={next} />}
     >
       <form className="log-add-field" onSubmit={submit}>
         <input
           aria-label={LOG_COPY.place}
           placeholder={LOG_COPY.placePlaceholder}
-          enterKeyHint="next"
-          value={place}
-          onChange={(event) => onChange(event.target.value)}
+          enterKeyHint={noPlaceYet ? 'next' : 'done'}
+          value={placeText}
+          onChange={(event) => onChange({ placeText: event.target.value })}
         />
       </form>
       {unsaved && <SaveForNextTime name={typed} onSave={saveTyped} />}
-      {(savedPlaces.length > 0 || editing) && (
-        <>
-          <EditToggle editing={editing} onToggle={toggleEditing} />
-          <ChipGroup label={LOG_COPY.savedPlaces}>
-            {savedPlaces.map((saved) =>
-              editing ? (
-                <RemoveChip
-                  key={saved.name}
-                  label={saved.name}
-                  removeLabel={LOG_COPY.removeChip(saved.name)}
-                  onRemove={() => void remove(saved)}
-                />
-              ) : (
-                <Chip
-                  key={saved.name}
-                  label={saved.name}
-                  pressed={saved.name === typed}
-                  onClick={() => onPick(saved.name)}
-                />
-              ),
-            )}
-          </ChipGroup>
-        </>
-      )}
+      <PlaceChips places={places} savedPlaces={savedPlaces} onTap={tapChip} />
     </Panel>
   )
 }

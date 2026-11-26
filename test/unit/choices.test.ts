@@ -20,6 +20,21 @@ describe('placesByLastUse', () => {
     expect(names(placesByLastUse(saved, meetups))).toEqual(['בטיילת', 'בים', 'בקפה', 'אצל נועם'])
   })
 
+  it('counts a place visited later in a meetup as used then', () => {
+    const saved = [
+      { name: 'בטיילת', savedAt: 1 },
+      { name: 'בים', savedAt: 2 },
+      { name: 'בבית', savedAt: 3 },
+    ]
+
+    const meetups = [
+      aMeetup({ date: '2026-11-03', place: 'בבית' }),
+      aMeetup({ date: '2026-11-05', place: 'בטיילת', laterPlaces: ['בים'] }),
+    ]
+
+    expect(names(placesByLastUse(saved, meetups))).toEqual(['בטיילת', 'בים', 'בבית'])
+  })
+
   it('shows every saved place', () => {
     const saved = Array.from({ length: 8 }, (_, index) => ({ name: `מקום ${index + 1}`, savedAt: index }))
 

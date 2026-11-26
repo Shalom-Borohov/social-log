@@ -20,6 +20,7 @@ async function logAWalk() {
     personIds: [tamar.id, maya.id],
     groupId: friends.id,
     place: 'בטיילת',
+    laterPlaces: ['בים'],
     minutes: 90,
     rating: 4,
     activities: ['הליכה'],
@@ -59,6 +60,7 @@ describe('backup', () => {
 
     expect(backup).toMatchObject({ version: 1, exportedAt })
     expect({ people: await allPeople(), groups: await allGroups(), meetups: await allMeetups() }).toStrictEqual(before)
+    expect(await allMeetups()).toEqual([expect.objectContaining({ place: 'בטיילת', laterPlaces: ['בים'] })])
   })
 
   it('round-trips favourites', async () => {
@@ -157,6 +159,7 @@ describe('backup', () => {
   it.each([
     ['a future date', { date: '2099-01-01' }],
     ['an empty place', { place: '' }],
+    ['an empty later place', { laterPlaces: ['בים', ''] }],
     ['someone not in the file', { personIds: ['stranger'] }],
   ])('rejects a meetup with %s', (_case, change) => {
     const meetup = { id: 'm', date: '2026-11-07', personIds: ['p'], place: 'בבית', minutes: 60, rating: 2, createdAt: 1, ...change }

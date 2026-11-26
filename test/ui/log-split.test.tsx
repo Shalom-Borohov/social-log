@@ -110,7 +110,7 @@ describe('splitting several places saved together', () => {
   })
   freezeDate(new Date(2026, 10, 8, 10).getTime())
 
-  it('saves each part on פיצול ל־2 and keeps the meetup’s place as typed', async () => {
+  it('saves each part on פיצול ל־2', async () => {
     expect(alertHeader()).toBe('לשמור בנפרד?')
     expect(alertMessage()).toBe('בטיילת · בים')
 
@@ -118,13 +118,6 @@ describe('splitting several places saved together', () => {
 
     await waitFor(async () => expect((await savedPlaceChips()).sort()).toEqual(['בטיילת', 'בים']))
     expect(screen.queryByRole('button', { name: 'שמירת „בטיילת ובים” לפעם הבאה' })).not.toBeInTheDocument()
-
-    await tap('המשך')
-    await tap('שעה')
-    await tap('טוב')
-    await tap('שמירה')
-
-    await waitFor(async () => expect(await db.meetups.toArray()).toEqual([expect.objectContaining({ place: 'בטיילת ובים' })]))
   })
 
   it('saves the text as one place on להשאיר כמו שכתוב', async () => {
