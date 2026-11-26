@@ -15,9 +15,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run lint`: oxlint.
 - `npm run build`: `tsc -b && vite build`. This is the type check; there is no separate `tsc` script.
 
-Every PR that ships raises `version` in `package.json` (minor for features, patch for fixes) and adds a release to `src/appUpdate/changelog.ts` with short Hebrew lines under `features` and `fixes`.
+Every PR that ships raises `version` in `package.json` (minor for features, patch for fixes) and adds a release to `src/appUpdate/changelog.ts` with short Hebrew lines under `features` and `fixes`. PRs that change only CI, docs or dependencies (Dependabot's) keep the version and add no release.
 
-CI (`.github/workflows/ci.yml`) runs lint, test and build on PRs. `deploy.yml` deploys to GitHub Pages on every push to `main`, with base path `/social-log/`. `ios-screenshot.yml`, run by hand from the Actions tab or by PRs that edit it, screenshots the picked branch in Safari on the iOS simulator (spec decision 25).
+CI (`.github/workflows/ci.yml`) runs lint, test and build on PRs. `deploy.yml` deploys to GitHub Pages on every push to `main`, with base path `/social-log/`. `ios-screenshot.yml`, run by hand from the Actions tab or by PRs that edit it, screenshots the picked branch in Safari on the iOS simulator (spec decision 25). `dependabot.yml` opens weekly grouped update PRs for npm and the actions (spec decision 49).
 
 ## Sources of truth
 
