@@ -46,6 +46,10 @@ const overlayEvent = (
     document.addEventListener(name, resolve, { once: true })
   })
 
+const OVERLAY_SETTLE_MS = 50
+
+export const overlaysSettled = () => new Promise((resolve) => setTimeout(resolve, OVERLAY_SETTLE_MS))
+
 export const actionSheetPresented = () => overlayEvent('ionActionSheetDidPresent')
 
 export const actionSheetDismissed = () => overlayEvent('ionActionSheetDidDismiss')
