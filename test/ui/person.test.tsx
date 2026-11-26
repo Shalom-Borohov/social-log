@@ -74,6 +74,28 @@ describe('a person’s page', () => {
     expect(await screen.findByText('בדרך כלל כל חודשיים')).toBeInTheDocument()
   })
 
+  it('words a half-day usual gap as the whole days below it', async () => {
+    await resetDb()
+    await store({
+      people: [tamar],
+      meetups: ['2026-10-01', '2026-10-08', '2026-10-16'].map((date) => aMeetup({ id: date, date, personIds: ['tamar'] })),
+    })
+    renderAt(TAMAR_PAGE)
+
+    expect(await screen.findByText('בדרך כלל כל 7 ימים')).toBeInTheDocument()
+  })
+
+  it('rounds a half-day usual gap down before wording it in weeks', async () => {
+    await resetDb()
+    await store({
+      people: [tamar],
+      meetups: ['2026-09-01', '2026-09-18', '2026-10-06'].map((date) => aMeetup({ id: date, date, personIds: ['tamar'] })),
+    })
+    renderAt(TAMAR_PAGE)
+
+    expect(await screen.findByText('בדרך כלל כל שבועיים')).toBeInTheDocument()
+  })
+
   it('says when there are too few meetups for a usual gap, and leaves out who initiated when unknown', async () => {
     await store({ people: [aPerson({ id: 'ori', name: 'אורי' })], meetups: [aMeetup({ personIds: ['ori'] })] })
     renderAt('/tabs/friends/person/ori')

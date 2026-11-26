@@ -75,11 +75,13 @@ const meetupSchema = object({
 
 const savedChoiceSchema = object({ name: pipe(string(), minLength(1)), savedAt: number() })
 
-const everyoneIsKnown = ({ people, meetups }: Backup) => {
-  const personIds = new Set(people.map(({ id }) => id))
+const namesOnlyKnownPeople =
+  (knownPersonIds: Set<string>) =>
+  ({ personIds }: Pick<Meetup, 'personIds'>) =>
+    personIds.every((personId) => knownPersonIds.has(personId))
 
-  return meetups.every((meetup) => meetup.personIds.every((personId) => personIds.has(personId)))
-}
+const everyoneIsKnown = ({ people, meetups }: Backup) =>
+  meetups.every(namesOnlyKnownPeople(new Set(people.map(({ id }) => id))))
 
 const backupSchema = pipe(
   object({
@@ -118,7 +120,7 @@ export async function exportBackup(now: number): Promise<Backup> {
   const [people, groups, meetups, savedPlaces, savedActivities, circles] = await Promise.all([
     db.people.toArray(),
     db.groups.toArray(),
-    db.meetups.orderBy('date').toArray(),
+    db.meetups.toCollection().sortBy('date'),
     db.savedPlaces.toArray(),
     db.savedActivities.toArray(),
     db.circles.toArray(),
@@ -131,13 +133,23 @@ export async function exportBackup(now: number): Promise<Backup> {
 const countInvalid = (records: unknown[], schema: GenericSchema) =>
   records.filter((record) => !safeParse(schema, record).success).length
 
+function countBadMeetups(meetups: unknown[], knownPersonIds: Set<string>) {
+  const isKnown = namesOnlyKnownPeople(knownPersonIds)
+
+  return meetups.filter((record) => {
+    const result = safeParse(meetupSchema, record)
+
+    return !result.success || !isKnown(result.output)
+  }).length
+}
+
 export function countBadRecords(fileText: string): number {
   const { people, groups, meetups, savedPlaces = [], savedActivities = [], circles = [] } = JSON.parse(fileText)
 
   return (
     countInvalid(people, personSchema) +
     countInvalid(groups, groupSchema) +
-    countInvalid(meetups, meetupSchema) +
+    countBadMeetups(meetups, new Set(people.map(({ id }: Pick<Person, 'id'>) => id))) +
     countInvalid(savedPlaces, savedChoiceSchema) +
     countInvalid(savedActivities, savedChoiceSchema) +
     countInvalid(circles, circleSchema)

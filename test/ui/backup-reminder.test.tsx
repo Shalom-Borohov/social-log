@@ -6,8 +6,8 @@ import { dayButton, openCalendar, store } from '../helpers/calendar'
 import { freezeDate } from '../helpers/clock'
 import { resetDb } from '../helpers/db'
 import { buttonByLabel } from '../helpers/ionic'
-import { aMeetup } from '../helpers/meetups'
-import { toasts } from '../helpers/overlays'
+import { aMeetup, aPerson } from '../helpers/meetups'
+import { alertShown, overlaysSettled, toasts } from '../helpers/overlays'
 
 const NEVER_LABEL = 'עדיין לא נעשה גיבוי'
 
@@ -15,7 +15,7 @@ const SIBLING_LAST_BACKUP_KEY = 'last-backup-at'
 
 const logged = [aMeetup({ date: '2026-10-28' }), aMeetup({ date: '2026-11-03' })]
 
-const overlaysSettled = () => new Promise((resolve) => setTimeout(resolve, 50))
+const noam = aPerson({ id: 'noam' })
 
 beforeEach(resetDb)
 freezeDate(new Date(2026, 10, 5, 10).getTime())
@@ -75,7 +75,7 @@ describe('the backup reminder', () => {
   })
 
   it('shares the backup when tapped, then goes away', async () => {
-    await store({ meetups: logged })
+    await store({ meetups: logged, people: [noam] })
 
     const share = stubShare(() => Promise.resolve())
 
@@ -87,8 +87,24 @@ describe('the backup reminder', () => {
     await waitFor(() => expect(screen.queryByText(NEVER_LABEL)).not.toBeInTheDocument())
   })
 
-  it('stays, with no message, when the share is cancelled', async () => {
+  it('stays after sharing a file with a bad record', async () => {
     await store({ meetups: logged })
+
+    const share = stubShare(() => Promise.resolve())
+
+    await openCalendar()
+
+    const shown = alertShown()
+
+    fireEvent.click(await screen.findByText(NEVER_LABEL))
+    await shown
+
+    expect(share).toHaveBeenCalledOnce()
+    expect(screen.getByText(NEVER_LABEL)).toBeInTheDocument()
+  })
+
+  it('stays, with no message, when the share is cancelled', async () => {
+    await store({ meetups: logged, people: [noam] })
 
     const share = stubShare(() => Promise.reject(new DOMException('cancelled', 'AbortError')))
 
@@ -99,10 +115,11 @@ describe('the backup reminder', () => {
 
     expect(screen.getByText(NEVER_LABEL)).toBeInTheDocument()
     expect(toasts()).toEqual([])
+    expect(document.querySelector('ion-alert')).toBeNull()
   })
 
   it('stays and says so in Hebrew when the share fails', async () => {
-    await store({ meetups: logged })
+    await store({ meetups: logged, people: [noam] })
     stubShare(() => Promise.reject(new Error('The request is not allowed')))
 
     await openCalendar()
@@ -113,7 +130,7 @@ describe('the backup reminder', () => {
   })
 
   it('opens one share sheet when tapped twice', async () => {
-    await store({ meetups: logged })
+    await store({ meetups: logged, people: [noam] })
 
     const share = stubShare(() => Promise.resolve())
 
@@ -129,7 +146,7 @@ describe('the backup reminder', () => {
   })
 
   it('goes away when the backup is exported from הגדרות', async () => {
-    await store({ meetups: logged })
+    await store({ meetups: logged, people: [noam] })
     stubShare(() => Promise.resolve())
 
     await openCalendar()

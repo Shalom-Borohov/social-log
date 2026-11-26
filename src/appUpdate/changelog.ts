@@ -2,9 +2,27 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
-    version: '1.10.1',
+    version: '1.10.4',
     features: [],
     fixes: ['VoiceOver מקריא את השם של מה חדש ושל חלון הדיווח כשהם נפתחים'],
+  },
+  {
+    version: '1.10.3',
+    features: [],
+    fixes: [
+      'ייצוא גיבוי בודק גם מפגשים עם חבר שכבר לא קיים',
+      'ייצוא גיבוי עם רשומה פגומה כבר לא נספר כגיבוי, והתזכורת נשארת',
+    ],
+  },
+  {
+    version: '1.10.2',
+    features: [],
+    fixes: ['שם שמתחיל ב־ו אחרי פסיק, כמו ורד, נשאר שלם בפיצול'],
+  },
+  {
+    version: '1.10.1',
+    features: [],
+    fixes: ['התזכורת "לא ראית את…" כבר לא מגיעה יום מאוחר מדי'],
   },
   {
     version: '1.10.0',

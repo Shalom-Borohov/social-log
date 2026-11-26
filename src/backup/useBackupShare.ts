@@ -15,7 +15,12 @@ async function shareStoredData(now: number): Promise<ExportResult> {
 
     badRecords = countBadRecords(fileText)
     await shareBackup(fileText, now)
-    recordBackupTimeIfStorageAllows(now)
+
+    const fileWouldImport = badRecords === 0
+
+    if (fileWouldImport) {
+      recordBackupTimeIfStorageAllows(now)
+    }
 
     return { failed: false, badRecords }
   } catch (error) {
