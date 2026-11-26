@@ -2,12 +2,17 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
-    version: '1.10.1',
+    version: '1.10.2',
     features: [],
     fixes: [
       'ייצוא גיבוי בודק גם מפגשים עם חבר שכבר לא קיים',
       'ייצוא גיבוי עם רשומה פגומה כבר לא נספר כגיבוי, והתזכורת נשארת',
     ],
+  },
+  {
+    version: '1.10.1',
+    features: [],
+    fixes: ['התזכורת "לא ראית את…" כבר לא מגיעה יום מאוחר מדי'],
   },
   {
     version: '1.10.0',
