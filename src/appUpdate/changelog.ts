@@ -2,9 +2,14 @@ import type { Release } from './releases'
 
 export const CHANGELOG: Release[] = [
   {
-    version: '1.10.1',
+    version: '1.10.2',
     features: [],
     fixes: ['שם שמתחיל ב־ו אחרי פסיק, כמו ורד, נשאר שלם בפיצול'],
+  },
+  {
+    version: '1.10.1',
+    features: [],
+    fixes: ['התזכורת "לא ראית את…" כבר לא מגיעה יום מאוחר מדי'],
   },
   {
     version: '1.10.0',

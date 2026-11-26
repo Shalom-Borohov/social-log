@@ -17,7 +17,7 @@ export function PersonSummaryList({ person, summary }: PersonSummaryListProps) {
   const save = useSave()
   const { history, lastDate, usualGap, initiated } = summary
   const initiatorRecords = initiated.me + initiated.them
-  const gapText = usualGap === null ? FRIENDS_COPY.notEnoughMeetups : FRIENDS_COPY.usualGap(sinceLabel(usualGap))
+  const gapText = usualGap === null ? FRIENDS_COPY.notEnoughMeetups : FRIENDS_COPY.usualGap(sinceLabel(Math.floor(usualGap)))
 
   return (
     <IonList inset>
